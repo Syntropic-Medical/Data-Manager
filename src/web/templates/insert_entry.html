@@ -2,10 +2,10 @@
 
 {% block content %}
 
- <title>Add experiment</title>
- <h1>Add new experiment</h1>
+ <title>Add entry</title>
+ <h1>Add new entry</h1>
  <div class="container border rounded addpage">
- <form action="/insert_experiment_to_db" method=post enctype=multipart/form-data>
+ <form action="/insert_entry_to_db" method=post enctype=multipart/form-data>
     <div class="form-row uploadrows">
         
 
@@ -16,8 +16,8 @@
 
 
     <div class="form-group col-md-4">
-      <label for="experiment_name">Experiment Name *</label>
-      <input class="form-control" name="experiment_name" autocomplete="off" required> 
+      <label for="entry_name">entry Name *</label>
+      <input class="form-control" name="entry_name" autocomplete="off" required> 
   </div>
 
 
@@ -81,8 +81,8 @@
       </div>
 
       <div class="form-group col-md-6">
-        <label for="parent_experiment">Parent Experiment</label>
-        <input class="form-control" name="parent_experiment" autocomplete="off"> 
+        <label for="parent_entry">Parent entry</label>
+        <input class="form-control" name="parent_entry" autocomplete="off"> 
     </div>
 
 
@@ -106,7 +106,7 @@
 <div class="input-group mb-3 row" style="padding-bottom: 2rem; padding-top: 2rem;">
 
   <div class="col-md-4">
-    <button class="btn btn-primary" type=submit Course> Insert Experiment</button>
+    <button class="btn btn-primary" type=submit Course> Insert entry</button>
   </div>
 
 </div>

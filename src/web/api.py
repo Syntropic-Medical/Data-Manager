@@ -13,6 +13,7 @@ import operators
 from dictianory import slef_made_codes, slef_made_codes_inv_map
 import flask
 from threading import Thread
+from markupsafe import Markup
 
 import datetime as dt
 from flask_sessionstore import Session
@@ -131,10 +132,10 @@ class WebApp():
         @app.route('/', methods=['GET', 'POST'])
         @security.login_required
         def index():
-            experiments_list = search_engine.experiments_time_line(self.db_configs.conn)
-            experiments_html = flask.render_template('experiments_list.html', experiments_list=experiments_list)
-            experiments_html = flask.Markup(experiments_html)
-            return flask.render_template('index.html', experiments_html=experiments_html)
+            entries_list = search_engine.entries_time_line(self.db_configs.conn)
+            entries_html = flask.render_template('entries_list.html', entries_list=entries_list)
+            entries_html = Markup(entries_html)
+            return flask.render_template('index.html', entries_html=entries_html)
 
         @app.route('/logout')
         @security.login_required
@@ -250,17 +251,17 @@ class WebApp():
             users = utils.get_users(self.db_configs.conn)
 
             users_html = [flask.render_template('user_profile_template.html', user=user) for user in users]
-            users_html = [flask.Markup(user_html) for user_html in users_html]
+            users_html = [Markup(user_html) for user_html in users_html]
 
             return flask.render_template('user_management.html', users_html=users_html, users=users)
 
-        @app.route('/experiments', methods=['GET', 'POST'])
+        @app.route('/entries', methods=['GET', 'POST'])
         @security.login_required
-        def experiments():
+        def entries():
             conditions = utils.read_json_file(self.app.config['CONDITIONS_JSON'])
             conditions = utils.modify_conditions_json(conditions, target_conditions=[])
             conditions_html = flask.render_template('conditions.html', conditions=conditions)
-            conditions_html = flask.Markup(conditions_html)
+            conditions_html = Markup(conditions_html)
 
             tomorrow_date = (dt.datetime.now() + dt.timedelta(days=1)).strftime("%Y-%m-%d")
             yesterday_date = (dt.datetime.now() - dt.timedelta(days=1)).strftime("%Y-%m-%d")
@@ -268,26 +269,26 @@ class WebApp():
             dates = [yesterday_date, tomorrow_date]
 
             if flask.request.method == 'POST' and len(flask.request.form):
-                experiments_list = search_engine.filter_experiments(self.db_configs.conn, flask.request.form)
-                experiments_html = flask.render_template('experiments_list.html', experiments_list=experiments_list)
-                experiments_html = flask.Markup(experiments_html)
-                return flask.render_template('experiments.html', experiments_html=experiments_html, conditions_html=conditions_html, dates=dates)
+                entries_list = search_engine.filter_entries(self.db_configs.conn, flask.request.form)
+                entries_html = flask.render_template('entries_list.html', entries_list=entries_list)
+                entries_html = Markup(entries_html)
+                return flask.render_template('entries.html', entries_html=entries_html, conditions_html=conditions_html, dates=dates)
 
             else:
-                return flask.render_template('experiments.html', experiments_html=None, conditions_html=conditions_html, dates=dates)
+                return flask.render_template('entries.html', entries_html=None, conditions_html=conditions_html, dates=dates)
 
-        @app.route('/insert_experiment', methods=('GET', 'POST'))
+        @app.route('/insert_entry', methods=('GET', 'POST'))
         @security.login_required
-        def insert_experiment():
+        def insert_entry():
             conditions_list = utils.list_user_conditoins_templates(self.db_configs.conn, self.app.config, flask.session)
             methods_list = utils.get_methods_list(self.app.config)
             today_date = dt.datetime.now().strftime("%Y-%m-%d")
-            return flask.render_template('insert_experiment.html', conditions_list=conditions_list, today_date=today_date, methods_list=methods_list)
+            return flask.render_template('insert_entry.html', conditions_list=conditions_list, today_date=today_date, methods_list=methods_list)
 
-        @app.route('/insert_experiment_to_db', methods=['GET', 'POST'])
+        @app.route('/insert_entry_to_db', methods=['GET', 'POST'])
         @security.login_required
         @self.logger
-        def insert_experiment_to_db():
+        def insert_entry_to_db():
             if flask.request.method == 'POST':
                 try:
                     Author = flask.session['username']
@@ -296,21 +297,21 @@ class WebApp():
                     File_Path = flask.request.form['File_Path']
                     Notes = flask.request.form['Notes']
                     Files = flask.request.files.getlist('Files')
-                    experiment_name = flask.request.form['experiment_name']
-                    parent_experiment = flask.request.form['parent_experiment']
+                    entry_name = flask.request.form['entry_name']
+                    parent_entry = flask.request.form['parent_entry']
 
                 except:
                     flask.flash('Please fill all the forms')
-                    return flask.redirect(flask.url_for('insert_experiment'))
+                    return flask.redirect(flask.url_for('insert_entry'))
 
-                if not utils.check_hash_id_existence(self.db_configs.conn, parent_experiment) and parent_experiment != '':
-                    flask.flash('Parent experiment does not exist')
-                    return flask.redirect(flask.url_for('insert_experiment'))
+                if not utils.check_hash_id_existence(self.db_configs.conn, parent_entry) and parent_entry != '':
+                    flask.flash('Parent entry does not exist')
+                    return flask.redirect(flask.url_for('insert_entry'))
 
 
-                if Author == '' or date == '' or experiment_name == '':
+                if Author == '' or date == '' or entry_name == '':
                     flask.flash('Please fill all the forms')
-                    return flask.redirect(flask.url_for('insert_experiment'))
+                    return flask.redirect(flask.url_for('insert_entry'))
 
                 conditions = []
 
@@ -323,13 +324,13 @@ class WebApp():
                         list_tmp = '&'.join(list_tmp)
                         conditions.append(list_tmp)
                 conditions = ','.join(conditions)
-                success_bool, hash_id = operators.insert_experiment_to_db(conn=self.db_configs.conn, Author=Author, date=date, Tags=Tags, File_Path=File_Path, Notes=Notes, conditions=conditions, experiment_name=experiment_name, parent_experiment=parent_experiment)
+                success_bool, hash_id = operators.insert_entry_to_db(conn=self.db_configs.conn, Author=Author, date=date, Tags=Tags, File_Path=File_Path, Notes=Notes, conditions=conditions, entry_name=entry_name, parent_entry=parent_entry)
                 
                 if hash_id:
                     utils.upload_files(self.app.config, hash_id, Files)
 
                 if success_bool:
-                    message = flask.Markup(f'Experiment is added successfully! hash_id: {hash_id}')
+                    message = Markup(f'entry is added successfully! hash_id: {hash_id}')
 
                 else:
                     message = 'Something went wrong'
@@ -355,71 +356,71 @@ class WebApp():
             searchbox = flask.request.form.get("text")
             return search_engine.text_search_in_db(conn=self.db_configs.conn, keyword=searchbox)
 
-        @app.route("/experiment/<int:id>", methods=["POST", "GET"])
+        @app.route("/entry/<int:id>", methods=["POST", "GET"])
         @security.login_required
-        def experiment(id):
+        def entry(id):
             cursor = self.db_configs.conn.cursor()
-            cursor.execute("SELECT * FROM experiments WHERE id=?", (id,))
-            experiment = cursor.fetchone()
-            target_conditions = experiment[6]
-            experiment = list(experiment)
-            experiment[6] = utils.parse_conditions(experiment[6])
-            for i in range(len(experiment[6])):
-                if len(experiment[6][i].split('&')) ==3:
-                    experiment[6][i] = experiment[6][i].split('&')[-1]
+            cursor.execute("SELECT * FROM entries WHERE id=?", (id,))
+            entry = cursor.fetchone()
+            target_conditions = entry[6]
+            entry = list(entry)
+            entry[6] = utils.parse_conditions(entry[6])
+            for i in range(len(entry[6])):
+                if len(entry[6][i].split('&')) ==3:
+                    entry[6][i] = entry[6][i].split('&')[-1]
                 else:
-                    experiment[6][i] = '->'.join(experiment[6][i].split('&')[-2:])
-            hash_id = experiment[0]
+                    entry[6][i] = '->'.join(entry[6][i].split('&')[-2:])
+            hash_id = entry[0]
             dirName = os.path.join(app.config['UPLOAD_FOLDER'], hash_id)
             List = os.listdir(dirName)
 
             family_tree_html = utils.family_tree_to_html(self.db_configs.conn, hash_id, self.app.config['FAMILY_TREE_FOLDER'])
-            family_tree_html = flask.Markup(family_tree_html)
+            family_tree_html = Markup(family_tree_html)
 
             for count, filename in enumerate(List):
                 List[count] = [os.path.join(app.config['UPLOAD_FOLDER'], hash_id, filename), f"{slef_made_codes_inv_map['remove']}&{filename}", filename]
 
             Files = List
             conditions = utils.read_json_file(self.app.config['CONDITIONS_JSON'])
-            experiment = tuple(experiment)
+            entry = tuple(entry)
             conditions = utils.modify_conditions_json(conditions, target_conditions)
             conditions_html = flask.render_template('conditions.html', conditions=conditions)
-            conditions_html = flask.Markup(conditions_html)
-            return flask.render_template('experiment.html', experiment=experiment, Files=Files, conditions_html=conditions_html, family_tree_html=family_tree_html)
+            conditions_html = Markup(conditions_html)
+            return flask.render_template('entry.html', entry=entry, Files=Files, conditions_html=conditions_html, family_tree_html=family_tree_html)
 
-        @app.route("/experiment_by_hash_id/<string:hash_id>", methods=["POST", "GET"])
+        @app.route("/entry_by_hash_id/<string:hash_id>", methods=["POST", "GET"])
         @security.login_required
-        def experiment_by_hash_id(hash_id):
+        def entry_by_hash_id(hash_id):
             id = utils.get_id_by_hash_id(self.db_configs.conn, hash_id)
-            return flask.redirect(flask.url_for('experiment', id=id))
+            return flask.redirect(flask.url_for('entry', id=id))
 
-        @app.route("/experiment/<int:id>/update_experiment", methods=["POST", "GET"])
+        @app.route("/entry/<int:id>/update_entry", methods=["POST", "GET"])
         @security.login_required
         @self.logger
-        def update_experiment(id):
+        def update_entry(id):
             post_form = flask.request.form
-            experiment = utils.get_experiment_by_id(self.db_configs.conn, id)
-            author = experiment[5]
+            entry = utils.get_entry_by_id(self.db_configs.conn, id)
+            author = entry[5]
             usename = flask.session['username']
             admin = flask.session['admin']
             if author != usename and not admin:
-                flask.flash('You are not allowed to edit this experiment')
-                return flask.redirect(flask.url_for('experiment', id=id))
+                flask.flash('You are not allowed to edit this entry')
+                return flask.redirect(flask.url_for('entry', id=id))
 
             # get hash_id from id
             cursor = self.db_configs.conn.cursor()
-            cursor.execute("SELECT id_hash FROM experiments WHERE id=?", (id,))
+            cursor.execute("SELECT id_hash FROM entries WHERE id=?", (id,))
             hash_id = cursor.fetchone()[0]
 
-            parent_experiment = flask.request.form['parent_experiment']
-            if not utils.check_hash_id_existence(self.db_configs.conn, parent_experiment) and parent_experiment != '':
-                    flask.flash('Parent experiment does not exist')
-                    return flask.redirect(flask.url_for('experiment', id=id))
+            parent_entry = flask.request.form['parent_entry']
+            if not utils.check_hash_id_existence(self.db_configs.conn, parent_entry) and parent_entry != '':
+                    flask.flash('Parent entry does not exist')
+                    return flask.redirect(flask.url_for('entry', id=id))
 
-            success_bool = operators.update_experiment_in_db(self.db_configs.conn, id, post_form, app.config, hash_id, flask.request.files.getlist('Files'))
+            success_bool = operators.update_entry_in_db(self.db_configs.conn, id, post_form, app.config, hash_id, flask.request.files.getlist('Files'))
 
             if success_bool:
-                message = 'Experiment is updated successfully'
+                message = 'entry is updated successfully'
 
             else:
                 message = 'Something went wrong'
@@ -427,23 +428,23 @@ class WebApp():
             flask.flash(message)
             return flask.redirect(flask.url_for('index'))
 
-        @app.route("/experiment/<int:id>/delete_experiment", methods=["POST", "GET"])
+        @app.route("/entry/<int:id>/delete_entry", methods=["POST", "GET"])
         @security.login_required
         @self.logger
-        def delete_experiment(id):
-            experiment = utils.get_experiment_by_id(self.db_configs.conn, id)
-            author = experiment[5]
-            author = experiment[5]
+        def delete_entry(id):
+            entry = utils.get_entry_by_id(self.db_configs.conn, id)
+            author = entry[5]
+            author = entry[5]
             usename = flask.session['username']
             admin = flask.session['admin']
             if author != usename and not admin:
-                flask.flash('You are not allowed to delete this experiment')
-                return flask.redirect(flask.url_for('experiment', id=id))
+                flask.flash('You are not allowed to delete this entry')
+                return flask.redirect(flask.url_for('entry', id=id))
 
-            success_bool = operators.delete_experiment_from_db(self.db_configs.conn, id)
+            success_bool = operators.delete_entry_from_db(self.db_configs.conn, id)
 
             if success_bool:
-                message = 'Experiment is deleted successfully'
+                message = 'entry is deleted successfully'
 
             else:
                 message = 'Something went wrong'
@@ -499,7 +500,7 @@ class WebApp():
             # coonvert user to dict with columns as keys
             user = dict(zip(columns, user))
             user_html = flask.render_template('user_profile_template.html', user=user)
-            user_html = flask.Markup(user_html)
+            user_html = Markup(user_html)
             return flask.render_template('profile.html', user_html=user_html)
 
         @app.route("/<path:filename>")
@@ -513,13 +514,13 @@ class WebApp():
             else:
                 return flask.redirect(flask.url_for('login'))
 
-        @app.route('/send_experiment_file/<int:experiment_id>/<path:path>')
+        @app.route('/send_entry_file/<int:entry_id>/<path:path>')
         @security.login_required
-        def send_experiment_file(experiment_id, path):
+        def send_entry_file(entry_id, path):
             if '/' not in path:
                 cwd = os.getcwd()
                 cwd = os.path.join(cwd, app.config['UPLOAD_FOLDER'])
-                hash_id = utils.get_hash_id_by_experiment_id(self.db_configs.conn, experiment_id)
+                hash_id = utils.get_hash_id_by_entry_id(self.db_configs.conn, entry_id)
                 path = os.path.join(hash_id, path)
                 return flask.send_from_directory(cwd, path, as_attachment=True)
 
@@ -541,33 +542,33 @@ class WebApp():
             condition_html = utils.get_conditions_by_template_and_method(self.db_configs.conn, app.config, username, template_name, method_name)
             return condition_html
 
-        @app.route('/experiment_report_maker/<int:id>', methods=["POST", "GET"])
+        @app.route('/entry_report_maker/<int:id>', methods=["POST", "GET"])
         @security.login_required
         @self.logger
-        def experiment_report_maker(id):
+        def entry_report_maker(id):
             cwd = os.getcwd()
             cwd = os.path.join(cwd, app.config['DATABASE_FOLDER'], 'reports')
-            experiment_report = utils.experiment_report_maker(self.db_configs.conn, id)
+            entry_report = utils.entry_report_maker(self.db_configs.conn, id)
             file_path = os.path.join(cwd, f'report_{id}.txt')
             with open(file_path, 'w') as f:
-                f.write(experiment_report)
+                f.write(entry_report)
             return flask.send_from_directory(cwd,  f'report_{id}.txt',as_attachment=True)
 
-        @app.route('/experiments_actions', methods=["POST", "GET"])
+        @app.route('/entries_actions', methods=["POST", "GET"])
         @security.login_required
         @self.logger
-        def experiments_actions():
+        def entries_actions():
             if flask.request.method == 'POST':
                 post_form = flask.request.form
-                experiments_ids = []
+                entries_ids = []
                 action = post_form['action']  
                 for key in post_form:
                     if '&' in key:
                         if key.split('&')[0] == 'Select':
-                            experiments_ids.append(int(key.split('&')[1]))
+                            entries_ids.append(int(key.split('&')[1]))
 
-                if len(experiments_ids) == 0:
-                    flask.flash('No experiments were selected')
+                if len(entries_ids) == 0:
+                    flask.flash('No entries were selected')
                     return flask.redirect(flask.request.referrer)
 
                 if action == 'bulk_report':
@@ -576,21 +577,21 @@ class WebApp():
                     username = flask.session['username']
                     file_path = os.path.join(cwd, f'bulk_report_{username}.txt')
                     with open(file_path, 'w') as f:
-                        for id in experiments_ids:
-                            experiment_report = utils.experiment_report_maker(self.db_configs.conn, id)
-                            f.write(experiment_report)
+                        for id in entries_ids:
+                            entry_report = utils.entry_report_maker(self.db_configs.conn, id)
+                            f.write(entry_report)
                             f.write(f"\n\n{'-'*20}\n\n")
                     return flask.send_from_directory(cwd, f'bulk_report_{username}.txt', as_attachment=True)
 
-                elif action == 'set_parent_experiment':
-                    parent_experiment_hash_id = post_form['parent_experiment_hash_id']
-                    if utils.check_hash_id_existence(self.db_configs.conn, parent_experiment_hash_id):
-                        for id in experiments_ids:
-                            utils.set_parent_experiment(self.db_configs.conn, id, parent_experiment_hash_id)
-                        flask.flash('Parent experiment was set successfully')
+                elif action == 'set_parent_entry':
+                    parent_entry_hash_id = post_form['parent_entry_hash_id']
+                    if utils.check_hash_id_existence(self.db_configs.conn, parent_entry_hash_id):
+                        for id in entries_ids:
+                            utils.set_parent_entry(self.db_configs.conn, id, parent_entry_hash_id)
+                        flask.flash('Parent entry was set successfully')
                         return flask.redirect(flask.request.referrer)
                     else:
-                        flask.flash('Parent experiment Hash ID does not exist')
+                        flask.flash('Parent entry Hash ID does not exist')
                         return flask.redirect(flask.request.referrer)
 
         @app.route('/chatroom', methods=["GET", "POST"])
@@ -676,5 +677,7 @@ class WebApp():
             return flask.url_for('editor')
 
             
-        t = Thread(target=waitress.serve, args=([self.app]), kwargs={'host':self.ip, 'port':self.port, 'threads':self.num_threads})
-        t.start()        
+        # t = Thread(target=waitress.serve, args=([self.app]), kwargs={'host':self.ip, 'port':self.port, 'threads':self.num_threads})
+        # t.start()     
+        waitress.serve(self.app, host=self.ip, port=self.port)
+        

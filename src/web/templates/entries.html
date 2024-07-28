@@ -2,9 +2,9 @@
 
 {% block content %}
 <div class="container">
-    <h1>{% block title %} Experiments {% endblock %}</h1> 
+    <h1>{% block title %} entries {% endblock %}</h1> 
     
-    <form action="/experiments" method=post enctype=multipart/form-data>
+    <form action="/entries" method=post enctype=multipart/form-data>
         <div class="row" style="padding-top: 2rem;text-align: center;">
 
             <div class="form-group col-md-6">
@@ -73,7 +73,7 @@
             
     </form>
 
-    {{experiments_html}}
+    {{entries_html}}
     
     </div>
 </div>
