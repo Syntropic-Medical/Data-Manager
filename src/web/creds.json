@@ -1,5 +1,7 @@
 {
     "SECRET_KEY" : "JIEO:FJ:IO9@)#8u2rIUL@HFrfrkeferfG8#",
-    "RECAPTCHA_PUBLIC_KEY" : "",
-    "RECAPTCHA_PRIVATE_KEY" : ""
+    "RECAPTCHA_PUBLIC_KEY" : "6LcqDxsqAAAAAK6-AWDXSgR6B6owu1Dsf2cQyHx4",
+    "RECAPTCHA_PRIVATE_KEY" : "6LcqDxsqAAAAAHGw7k7hLbJwcniaZ1CPlEjJu8gX",
+    "SENDER_EMAIL_ADDRESS": "noreply@syntropicmedical.com",
+    "SENDER_EMAIL_PASSWORD": "ksbp ntcy csta gqdp"
 }

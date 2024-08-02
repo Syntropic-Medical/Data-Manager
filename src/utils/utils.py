@@ -13,6 +13,7 @@ import networkx as nx
 import zipfile
 import shutil
 from markupsafe import Markup
+from typing import Union
 
 from datetime import datetime, date
 
@@ -389,3 +390,10 @@ def get_methods_list(app_config):
     methods_list.remove(app_config['CONDITIONS_JSON_DEFAULT'].split('.')[0])
     methods_list.insert(0, app_config['CONDITIONS_JSON_DEFAULT'].split('.')[0])
     return methods_list
+
+
+def check_emails_validity(emails: Union[list, tuple]) -> bool:
+    for email in emails:
+        if '@' not in email or '.' not in email:
+            return False
+    return True

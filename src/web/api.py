@@ -10,6 +10,7 @@ import utils
 import security
 import search_engine
 import operators
+import mailing
 from dictianory import slef_made_codes, slef_made_codes_inv_map
 import flask
 from threading import Thread
@@ -41,11 +42,12 @@ def add_admin(db_configs, app_configs):
         utils.init_user(app_configs, db_configs, 'admin')
 
 class WebApp():
-    def __init__(self, db_configs, ip, port, static_folder, recaptcha_bool, num_threads): 
+    def __init__(self, db_configs, ip, port, static_folder, recaptcha_bool, num_threads, mailing_bool): 
         self.ip = ip
         self.port = port
         self.num_threads = num_threads
         self.db_configs = db_configs
+        self.mailing_bool = mailing_bool
         self.app = flask.Flask(__name__, static_folder=static_folder)
         self.parent_path = str(pathlib.Path(__file__).parent.absolute())
         self.parent_parent_path = str(pathlib.Path(__file__).parent.parent.absolute())
@@ -162,7 +164,7 @@ class WebApp():
             name = flask.request.form['name']
             email = flask.request.form['email']
 
-            if username == '' or password == '' or admin == '':
+            if username == '' or password == '' or admin == '' or name == '' or email == '':
                 flask.flash('Please fill all the fields')
                 return flask.render_template('add_user.html')
 
@@ -184,6 +186,18 @@ class WebApp():
                 utils.init_user(app.config, self.db_configs, username)
                 conn.commit()
                 flask.flash('User added successfully')
+                # send email to the new user
+                if self.mailing_bool:
+                    mail_args = {'receiver_email': email,
+                                'sender_email': app.config['CREDS_FILE']['SENDER_EMAIL_ADDRESS'],
+                                'password': app.config['CREDS_FILE']['SENDER_EMAIL_PASSWORD'],
+                                'subject': 'Welcome to the datamanager',
+                                'username': username,
+                                'name': name,
+                                'user_password': password,
+                                'website_url': flask.request.host_url,
+                                }
+                    mailing.send_welcome_mail(mail_args)
                 return flask.redirect(flask.url_for('index'))
     
         @app.route("/update_user_in_db/<int:id>", methods=['POST', 'GET'])
@@ -593,6 +607,31 @@ class WebApp():
                     else:
                         flask.flash('Parent entry Hash ID does not exist')
                         return flask.redirect(flask.request.referrer)
+                    
+                elif action == "notify_by_email":
+                    email_addresses  = post_form['adress_for_notify_by_email']
+                    email_addresses = email_addresses.split(',')
+                    if not utils.check_emails_validity(email_addresses):
+                        flask.flash('Invalid email address/addresses')
+                        return flask.redirect(flask.request.referrer)
+                    for id in entries_ids:
+                        entry_report = utils.entry_report_maker(self.db_configs.conn, id)
+                        link2entry = f"{flask.request.host_url}entry/{id}"
+                        sender_email_address = app.config['CREDS_FILE']['SENDER_EMAIL_ADDRESS']
+                        sender_username = flask.session['username']
+                        for receiver_email_address in email_addresses:
+                            args = {'receiver_email': receiver_email_address, 
+                                    'sender_email': sender_email_address, 
+                                    'password': app.config['CREDS_FILE']['SENDER_EMAIL_PASSWORD'], 
+                                    'subject': f'Entry report notification (by {sender_username})',
+                                    'txt': entry_report,
+                                    'link2entry': link2entry,
+                                    'sender_username': sender_username
+                            }
+                        mailing.send_report_mail(args)
+
+                    flask.flash('Emails were sent successfully')
+                    return flask.redirect(flask.request.referrer)
 
         @app.route('/chatroom', methods=["GET", "POST"])
         @security.login_required

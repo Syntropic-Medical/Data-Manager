@@ -157,10 +157,22 @@ $(document).ready(function(){
 
 $(document).ready(function(){
   $("#action").change(function(){
-    if ($("#action").val() == "set_parent_experiment") {
-      $("#parent_experiment_hash_id").show();
+    if ($("#action").val() == "notify_by_email") {
+      $("#adress_for_notify_by_email").show();
     } else {
-      $("#parent_experiment_hash_id").hide();
+      $("#adress_for_notify_by_email").hide();
+    }
+  });
+});
+
+
+
+$(document).ready(function(){
+  $("#action").change(function(){
+    if ($("#action").val() == "set_parent_entry") {
+      $("#parent_entry_hash_id").show();
+    } else {
+      $("#parent_entry_hash_id").hide();
     }
   });
 });

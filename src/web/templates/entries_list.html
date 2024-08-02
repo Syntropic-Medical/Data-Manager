@@ -54,11 +54,16 @@
                 <select class="form-select" name="action" id="action" required>
                         <option value="bulk_report">Report</option>
                         <option value="set_parent_entry">Set parent entry</option>
+                        <option value="notify_by_email">Notify by email</option>
                 </select>
         </div>
         <div class="col-md-6" style="display:none" id="parent_entry_hash_id">
             <label for="parent_entry_hash_id">Parent HashID:</label>
             <input class="form-control" type="text" name="parent_entry_hash_id" autocomplete="off">
+        </div> 
+        <div class="col-md-6" style="display:none" id="adress_for_notify_by_email">
+            <label for="adress_for_notify_by_email">Target email adresses (comma separated):</label>
+            <input class="form-control" type="email" name="adress_for_notify_by_email" autocomplete="off">
         </div>  
         <div class="col-md-3">
             <button class="btn btn-primary" type=submit id="action">Submit</button>
