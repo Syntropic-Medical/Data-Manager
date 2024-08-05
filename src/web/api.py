@@ -196,7 +196,7 @@ class WebApp():
                                 'username': username,
                                 'name': name,
                                 'user_password': password,
-                                'website_url': flask.request.host_url,
+                                'website_url': self.host_url,
                                 }
                     mailing.send_welcome_mail(mail_args)
                 return flask.redirect(flask.url_for('index'))

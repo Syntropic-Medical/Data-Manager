@@ -39,7 +39,7 @@ def send_welcome_mail(info):
     <div>
     <p> Dear {name}, </p>
     <p> Welcome to the datamanager! </p>
-    <p> You have been registered in the datamanager. You can login with the following credentials via this <a href="{website_url}">link</a>. </p>
+    <p> You have been registered in the datamanager. You can login with the following credentials via this <a href="https://{website_url}">link</a>. </p>
     <p> Your username is: {username} </p>
     <p> Your password is: {user_password} </p>
     <br>
@@ -64,7 +64,7 @@ def send_report_mail(info):
     <div>
     <p> You were notified by {sender_username} about the following entry in the datamanager: </p>
     <br>
-    <a href="{link2entry}"> Link to entry</a>
+    <a href="https://{link2entry}"> Link to entry</a>
     <br>
     <br>
     <p> Entry report: </p>
