@@ -337,6 +337,12 @@ def get_entry_by_id(conn, entry_id):
     entry = cursor.fetchone()
     return entry
 
+def get_email_address_by_user_name(conn, user_name):
+    cursor = conn.cursor()
+    cursor.execute('select * from users where username=?', (user_name,))
+    user = cursor.fetchone()
+    return user[4]
+
 def restore_db(app_config, backup_file_path):
     try:
         parent_folder = os.path.dirname(backup_file_path)
@@ -390,6 +396,7 @@ def get_methods_list(app_config):
     methods_list.remove(app_config['CONDITIONS_JSON_DEFAULT'].split('.')[0])
     methods_list.insert(0, app_config['CONDITIONS_JSON_DEFAULT'].split('.')[0])
     return methods_list
+
 
 
 def check_emails_validity(emails: Union[list, tuple]) -> bool:

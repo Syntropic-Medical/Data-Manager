@@ -14,6 +14,20 @@ def author_search_in_db(conn, keyword):
         result = None
     return jsonify(result)
 
+def email_search_in_db(conn, keyword):
+    if keyword != '' and keyword != ' ':
+        keyword = keyword.split(',')
+        keyword = keyword[-1]
+        try:
+            cursor = conn.cursor()
+            cursor.execute("select *  FROM users WHERE email LIKE ? or username LIKE ? or name LIKE ?", (f"%{keyword}%", f"%{keyword}%", f"%{keyword}%"))
+            result = cursor.fetchall()
+        except:
+            result = None
+    else:
+        result = None
+    return jsonify(result)
+
 def tags_search_in_db(conn, keyword):
     if keyword != '' and keyword != ' ':
         keyword = keyword.split(',')

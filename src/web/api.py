@@ -358,6 +358,12 @@ class WebApp():
         def author_search():
             searchbox = flask.request.form.get("text")
             return search_engine.author_search_in_db(conn=self.db_configs.conn, keyword=searchbox)
+        
+        @app.route("/email_search", methods=["POST", "GET"])
+        @security.login_required
+        def email_search():
+            searchbox = flask.request.form.get("text")
+            return search_engine.email_search_in_db(conn=self.db_configs.conn, keyword=searchbox)
 
         @app.route("/tags_search", methods=["POST", "GET"])
         @security.login_required
@@ -610,11 +616,8 @@ class WebApp():
                         return flask.redirect(flask.request.referrer)
                     
                 elif action == "notify_by_email":
-                    email_addresses  = post_form['adress_for_notify_by_email']
-                    email_addresses = email_addresses.split(',')
-                    if not utils.check_emails_validity(email_addresses):
-                        flask.flash('Invalid email address/addresses')
-                        return flask.redirect(flask.request.referrer)
+                    user_names  = post_form['adress_for_notify_by_email']
+                    email_addresses = [utils.get_email_address_by_user_name(self.db_configs.conn, user_name) for user_name in user_names.split(',')]
                     for id in entries_ids:
                         entry_report = utils.entry_report_maker(self.db_configs.conn, id)
                         host_url = self.host_url
@@ -630,7 +633,7 @@ class WebApp():
                                     'link2entry': link2entry,
                                     'sender_username': sender_username
                             }
-                        mailing.send_report_mail(args)
+                            mailing.send_report_mail(args)
 
                     flask.flash('Emails were sent successfully')
                     return flask.redirect(flask.request.referrer)

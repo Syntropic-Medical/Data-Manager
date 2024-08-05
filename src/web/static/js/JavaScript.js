@@ -99,6 +99,34 @@ $(document).ready(function(){
 
 
 $(document).ready(function(){
+    
+  $("#email_search").on("input",function(e){
+    document.getElementById('email_search_datalist').style.display = "block";
+      $("#email_search_datalist").empty();
+      $.ajax({
+          method:"post",
+          url:"/email_search",
+          data:{text:$("#email_search").val()},
+          success:function(res){
+              var data = "";
+              $.each(res,function(index,value){
+                  data += "<a class='search dropdown-item' onclick='replace_text(`email_search_datalist`, `email_search`, `"+value[0]+"`)'>";
+                  data += value[0]+"</a>";
+              });
+              data += "</ul>";
+              $("#email_search_datalist").html(data);
+          }
+      });
+  });
+  $(document).click(function(e) {
+    if (!$(e.target).is('#email_search')) {
+      document.getElementById('email_search_datalist').style.display = "none";
+    }
+  });
+});
+
+
+$(document).ready(function(){
   
   $("#tags_search").on("input",function(e){
     document.getElementById('tags_search_datalist').style.display = "block";

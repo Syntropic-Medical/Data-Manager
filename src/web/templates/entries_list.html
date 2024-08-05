@@ -106,10 +106,19 @@
                     <label for="parent_entry_hash_id">Parent HashID:</label>
                     <input class="form-control" type="text" name="parent_entry_hash_id" autocomplete="off">
                 </div>
-                <div class="col-md-6" style="display:none" id="adress_for_notify_by_email">
+                <!-- <div class="col-md-6" style="display:none" id="adress_for_notify_by_email">
                     <label for="adress_for_notify_by_email">Target email adresses (comma separated):</label>
                     <input class="form-control" type="email" name="adress_for_notify_by_email" autocomplete="off">
+                </div> -->
+
+                <div class="form-group col-md-6 SearchBarBody" style="display:none" id="adress_for_notify_by_email">
+                    <div class="dropdown show SearchBarMain">
+                        <label for="adress_for_notify_by_email">Target users (comma separated): </label>
+                        <input  class="SearchBarBox dropdown-header" type="search" id="email_search" placeholder="Search..." name="adress_for_notify_by_email" autocomplete="off">
+                        <div class="SearchBarBox" id="email_search_datalist"></div>
+                    </div> 
                 </div>
+
                 <div class="col-md-3">
                     <button class="btn btn-primary" type="submit" id="action">Submit</button>
                 </div>
