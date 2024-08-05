@@ -30,8 +30,9 @@ utils.apply_updates2db(db_configs)
 @click.option('--recaptcha_bool', '-rb', default=True, help='Enable recaptcha')
 @click.option('--num_threads', '-nt', default=6, help='Number of threads to run the server on')
 @click.option('--mailing_bool', '-mb', default=True, help='Enable mailing')
-def setup_all(server_ip, port, static_folder, recaptcha_bool, num_threads, mailing_bool):
-    webapp = api.WebApp(db_configs, server_ip, port, static_folder, recaptcha_bool, num_threads, mailing_bool)
+@click.option('--host_url', '-hu', help='Host url', required=True)
+def setup_all(server_ip, port, static_folder, recaptcha_bool, num_threads, mailing_bool, host_url):
+    webapp = api.WebApp(db_configs, server_ip, port, static_folder, recaptcha_bool, num_threads, mailing_bool, host_url)
     utils.init_directories(webapp.app.config['DATABASE_FOLDER'])
     webapp.run()
 

@@ -42,12 +42,13 @@ def add_admin(db_configs, app_configs):
         utils.init_user(app_configs, db_configs, 'admin')
 
 class WebApp():
-    def __init__(self, db_configs, ip, port, static_folder, recaptcha_bool, num_threads, mailing_bool): 
+    def __init__(self, db_configs, ip, port, static_folder, recaptcha_bool, num_threads, mailing_bool, host_url): 
         self.ip = ip
         self.port = port
         self.num_threads = num_threads
         self.db_configs = db_configs
         self.mailing_bool = mailing_bool
+        self.host_url = host_url
         self.app = flask.Flask(__name__, static_folder=static_folder)
         self.parent_path = str(pathlib.Path(__file__).parent.absolute())
         self.parent_parent_path = str(pathlib.Path(__file__).parent.parent.absolute())
@@ -616,7 +617,8 @@ class WebApp():
                         return flask.redirect(flask.request.referrer)
                     for id in entries_ids:
                         entry_report = utils.entry_report_maker(self.db_configs.conn, id)
-                        link2entry = f"{flask.request.host_url}entry/{id}"
+                        host_url = self.host_url
+                        link2entry = f"{host_url}entry/{id}"
                         sender_email_address = app.config['CREDS_FILE']['SENDER_EMAIL_ADDRESS']
                         sender_username = flask.session['username']
                         for receiver_email_address in email_addresses:
