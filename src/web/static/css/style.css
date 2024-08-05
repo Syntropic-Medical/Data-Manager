@@ -216,3 +216,27 @@ div.PanelLogin{
     .border-top {
         border-top: 1px solid #dee2e6!important;
     }
+
+
+.view-toggle {
+    margin-bottom: 1em;
+    text-align: center;
+}
+
+
+.active-card-view {
+    display: flex!important;
+    justify-content: center;
+}
+
+.active-table-view {
+    display: block!important;
+}
+
+.select-box {
+    padding-left: 2rem!important;
+}
+
+.hide-view {
+    display: none!important;
+}

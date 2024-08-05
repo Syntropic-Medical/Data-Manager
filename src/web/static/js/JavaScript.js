@@ -222,3 +222,33 @@ function copy_2_clipboard(that){
   inp.remove();
   alert("Copied the text: " + inp.value);
   }
+
+
+
+  function toggleView(view) {
+    var cardView = document.getElementById('cardView');
+    var tableView = document.getElementById('tableView');
+    var cardViewBtn = document.getElementById('cardViewBtn');
+    var tableViewBtn = document.getElementById('tableViewBtn');
+    if (view === 'card') {
+        cardView.classList.add('active-card-view');
+        cardView.classList.remove('hide-view');
+        tableView.classList.add('hide-view');
+        tableView.classList.remove('active-table-view');
+        cardViewBtn.classList.add('btn-primary');
+        cardViewBtn.classList.remove('btn-secondary');
+        tableViewBtn.classList.remove('btn-primary');
+        tableViewBtn.classList.add('btn-secondary');
+
+    } else {
+        cardView.classList.add('hide-view');
+        cardView.classList.remove('active-card-view');
+        tableView.classList.add('active-table-view');
+        tableView.classList.remove('hide-view');
+        cardViewBtn.classList.remove('btn-primary');
+        cardViewBtn.classList.remove('btn-secondary');
+        tableViewBtn.classList.remove('btn-secondary');
+        tableViewBtn.classList.add('btn-primary');
+
+    }
+}

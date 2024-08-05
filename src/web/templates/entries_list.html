@@ -1,73 +1,120 @@
-<form action="{{ url_for('entries_actions')}}" method=post enctype=multipart/form-data>
-<div class="card-deck" style="display: flex; justify-content: center;">
-    {% if entries_list is not none %}
-        {% for entry in entries_list %}
-
-            <div class="card-block" style="margin: .5rem;margin-bottom: 1em;margin-top: 1em;">
-                <div class="CardMain card text-center" style="width: 18rem;">
-                        <div class="row">
-                            <div class="col-md-1">
-                            </div>
-                            <div class="col-md-2">
-                                <input class="form-check-input" type="checkbox" id="Select&{{entry[-1]}}" name="Select&{{entry[-1]}}">
-                                <label class="form-check-label" for="Select&{{entry[-1]}}">
-                                    Select
-                                </label>
-                            </div>
-                            <div class="col-md-6">
-                                <a href="{{ url_for('entry', id=entry[-1]) }}">
-                                    <h4 class="CardMain">{{entry[7]}}</h4>
-                                </a>
-                            </div>
-                            <div class="col-md-3">
-                            </div>
-                        </div>
-                        <h4 class="CardMain" onclick="copy_2_clipboard(this)">{{entry[0]}}</h4>
-
-                        <h5 class="CardMain">{{ entry[5] }}</h5>
-                        <h6 class="CardMain">{{ entry[4] }}</h6>
-                <div class="card-footer" style="width: 18rem;overflow: auto;">
-
-                    {% for tag in entry[1] %}
-                        <span class="badge badge-info" >{{ tag }}</span>
-                    {% endfor %}
-
-                    </div>
-
-                    <div class="card-footer" style="width: 18rem;overflow: auto;">
-
-                        {% for condition in entry[6] %}
-                            <span class="badge badge-warning" >{{ condition }}</span>
-                        {% endfor %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entries</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="view-toggle">
+        <button id="cardViewBtn" class="btn btn-secondary" onclick="toggleView('card')">Card View</button>
+        <button id="tableViewBtn" class="btn btn-primary" onclick="toggleView('table')">Table View</button>
+    </div>
     
+    <form action="{{ url_for('entries_actions')}}" method="post" enctype="multipart/form-data" style="margin-top: 2rem;">
+        <div id="cardView" class="card-deck hide-view">
+            {% if entries_list is not none %}
+                {% for entry in entries_list %}
+                    <div class="card-block" style="margin: .5rem;margin-bottom: 1em;margin-top: 1em;">
+                        <div class="CardMain card text-center" style="width: 18rem;">
+                            <div class="row">
+                                <div class="col-md-1"></div>
+                                <div class="col-md-2">
+                                    <input class="form-check-input" type="checkbox" id="Select&{{entry[-1]}}" name="Select&{{entry[-1]}}">
+                                    <label class="form-check-label" for="Select&{{entry[-1]}}">Select</label>
+                                </div>
+                                <div class="col-md-6">
+                                    <a href="{{ url_for('entry', id=entry[-1]) }}">
+                                        <h4 class="CardMain">{{entry[7]}}</h4>
+                                    </a>
+                                </div>
+                                <div class="col-md-3"></div>
+                            </div>
+                            <h4 class="CardMain" onclick="copy_2_clipboard(this)">{{entry[0]}}</h4>
+                            <h5 class="CardMain">{{ entry[5] }}</h5>
+                            <h6 class="CardMain">{{ entry[4] }}</h6>
+                            <div class="card-footer" style="width: 18rem;overflow: auto;">
+                                {% for tag in entry[1] %}
+                                    <span class="badge badge-info">{{ tag }}</span>
+                                {% endfor %}
+                            </div>
+                            <div class="card-footer" style="width: 18rem;overflow: auto;">
+                                {% for condition in entry[6] %}
+                                    <span class="badge badge-warning">{{ condition }}</span>
+                                {% endfor %}
+                            </div>
                         </div>
-                </div>
-            </div>            
-        {% endfor %}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
 
-    {% endif %}
-</div>
-{% if entries_list is not none %}
-    <div class="input-group mb-3 row" style="padding-bottom: 2rem; padding-top: 2rem;">
-        <div class="col-md-3">
-                <label for="emailed">Action:</label>
-                <select class="form-select" name="action" id="action" required>
+        <div id="tableView" class="table-view active-view">
+            {% if entries_list is not none %}
+                <table class="table table-bordered table-striped">
+                    <thead>
+                        <tr>
+                            <th>Select</th>
+                            <th>Title</th>
+                            <th>Entry</th>
+                            <th>Detail</th>
+                            <th>Tags</th>
+                            <th>Conditions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in entries_list %}
+                            <tr>
+                                <td class="select-box">
+                                    <input class="form-check-input" type="checkbox" id="Select&{{entry[-1]}}" name="Select&{{entry[-1]}}">
+                                    <label class="form-check-label" for="Select&{{entry[-1]}}">Select</label>
+                                </td>
+                                <td>
+                                    <a href="{{ url_for('entry', id=entry[-1]) }}">{{entry[7]}}</a>
+                                </td>
+                                <td onclick="copy_2_clipboard(this)">{{entry[0]}}</td>
+                                <td>{{ entry[5] }}</td>
+                                <td>
+                                    {% for tag in entry[1] %}
+                                        <span class="badge badge-info">{{ tag }}</span>
+                                    {% endfor %}
+                                </td>
+                                <td>
+                                    {% for condition in entry[6] %}
+                                        <span class="badge badge-warning">{{ condition }}</span>
+                                    {% endfor %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% endif %}
+        </div>
+
+        {% if entries_list is not none %}
+            <div class="input-group mb-3 row" style="padding-bottom: 2rem; padding-top: 2rem;">
+                <div class="col-md-3">
+                    <label for="emailed">Action:</label>
+                    <select class="form-select" name="action" id="action" required>
                         <option value="bulk_report">Report</option>
                         <option value="set_parent_entry">Set parent entry</option>
                         <option value="notify_by_email">Notify by email</option>
-                </select>
-        </div>
-        <div class="col-md-6" style="display:none" id="parent_entry_hash_id">
-            <label for="parent_entry_hash_id">Parent HashID:</label>
-            <input class="form-control" type="text" name="parent_entry_hash_id" autocomplete="off">
-        </div> 
-        <div class="col-md-6" style="display:none" id="adress_for_notify_by_email">
-            <label for="adress_for_notify_by_email">Target email adresses (comma separated):</label>
-            <input class="form-control" type="email" name="adress_for_notify_by_email" autocomplete="off">
-        </div>  
-        <div class="col-md-3">
-            <button class="btn btn-primary" type=submit id="action">Submit</button>
-        </div>  
-    </div>
-{% endif %}
-</form>
+                    </select>
+                </div>
+                <div class="col-md-6" style="display:none" id="parent_entry_hash_id">
+                    <label for="parent_entry_hash_id">Parent HashID:</label>
+                    <input class="form-control" type="text" name="parent_entry_hash_id" autocomplete="off">
+                </div>
+                <div class="col-md-6" style="display:none" id="adress_for_notify_by_email">
+                    <label for="adress_for_notify_by_email">Target email adresses (comma separated):</label>
+                    <input class="form-control" type="email" name="adress_for_notify_by_email" autocomplete="off">
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-primary" type="submit" id="action">Submit</button>
+                </div>
+            </div>
+        {% endif %}
+    </form>
+</body>
+</html>
