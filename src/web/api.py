@@ -618,7 +618,7 @@ class WebApp():
                     for id in entries_ids:
                         entry_report = utils.entry_report_maker(self.db_configs.conn, id)
                         host_url = self.host_url
-                        link2entry = f"{host_url}entry/{id}"
+                        link2entry = f"{host_url}/entry/{id}"
                         sender_email_address = app.config['CREDS_FILE']['SENDER_EMAIL_ADDRESS']
                         sender_username = flask.session['username']
                         for receiver_email_address in email_addresses:
