@@ -12,7 +12,7 @@
         <button id="tableViewBtn" class="btn btn-primary" onclick="toggleView('table')">Table View</button>
     </div>
     
-    <form action="{{ url_for('entries_actions')}}" method="post" enctype="multipart/form-data" style="margin-top: 2rem;">
+    <form action="{{ url_for('entries_actions')}}" method="post" enctype="multipart/form-data" style="margin-top: 2rem!important;">
         <div id="cardView" class="card-deck hide-view">
             {% if entries_list is not none %}
                 {% for entry in entries_list %}

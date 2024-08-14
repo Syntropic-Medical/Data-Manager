@@ -395,8 +395,9 @@ class WebApp():
             dirName = os.path.join(app.config['UPLOAD_FOLDER'], hash_id)
             List = os.listdir(dirName)
 
-            family_tree_html = utils.family_tree_to_html(self.db_configs.conn, hash_id, self.app.config['FAMILY_TREE_FOLDER'])
-            family_tree_html = Markup(family_tree_html)
+            # family_tree_html = utils.family_tree_to_html(self.db_configs.conn, hash_id, self.app.config['FAMILY_TREE_FOLDER'])
+            # family_tree_html = Markup(family_tree_html)
+            family_tree_html = None
 
             for count, filename in enumerate(List):
                 List[count] = [os.path.join(app.config['UPLOAD_FOLDER'], hash_id, filename), f"{slef_made_codes_inv_map['remove']}&{filename}", filename]
