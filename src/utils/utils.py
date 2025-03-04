@@ -13,6 +13,7 @@ import operators
 import networkx as nx
 import zipfile
 import shutil
+import mailing
 import datetime as dt
 
 from datetime import datetime, date
@@ -323,15 +324,23 @@ def family_tree_to_html(conn, entry_hash_id, FAMILY_TREE_FOLDER):
     return html
 
 def get_users(conn):
+    """Get all users with their details"""
     cursor = conn.cursor()
-    cursor.execute('select * from users')
+    cursor.execute("""
+        SELECT username, password, admin, order_manager, name, email, email_enabled, id 
+        FROM users
+    """)
     users = cursor.fetchall()
-
-    cursor.execute("PRAGMA table_info(users)")
-    columns = cursor.fetchall()
-    columns = [column[1] for column in columns]
-    users = [dict(zip(columns, user)) for user in users]
-    return users
+    return [{
+        'username': user[0],
+        'password': user[1],
+        'admin': user[2],
+        'order_manager': user[3],
+        'name': user[4],
+        'email': user[5],
+        'email_enabled': user[6],
+        'id': user[7]
+    } for user in users]
 
 def get_entry_by_id(conn, entry_id):
     cursor = conn.cursor()
@@ -393,40 +402,27 @@ def get_methods_list(app_config):
     methods_list.insert(0, app_config['CONDITIONS_JSON_DEFAULT'].split('.')[0])
     return methods_list
 
-def send_order_notification(conn, recipient_username, subject, message):
-    """Send email notification for order-related events"""
-    cursor = conn.cursor()
-    cursor.execute("SELECT email FROM users WHERE username=?", (recipient_username,))
-    result = cursor.fetchone()
-    
-    if result and result[0]:  # If user has email
-        # Add message to messages table
-        cursor.execute("""
-            INSERT INTO messages (author, message, date, destination)
-            VALUES (?, ?, ?, ?)
-        """, ('system', message, dt.datetime.now(), recipient_username))
-        conn.commit()
-        
-        # Send email
-        send_email(
-            to=result[0],
-            subject=subject,
-            body=message
-        )
-        return True
-    return False
-
 
 def get_email_address_by_user_name(conn, user_name):
     cursor = conn.cursor()
-    cursor.execute('select * from users where username=?', (user_name,))
+    cursor.execute('SELECT email, email_enabled FROM users WHERE username=?', (user_name,))
     user = cursor.fetchone()
-    columns = [column[0] for column in cursor.description]
-    user = dict(zip(columns, user))
-    return user['email']
+    if not user or not user[1]:  # If user doesn't exist or email is disabled
+        return None
+    return user[0]
 
 def check_emails_validity(emails: Union[list, tuple]) -> bool:
     for email in emails:
         if '@' not in email or '.' not in email:
             return False
     return True
+
+def add_notification(conn, author, message, destination, notification_type, reference_id=None):
+    """Add a notification to the notifications table"""
+    cursor = conn.cursor()
+    cursor.execute("""
+        INSERT INTO notifications 
+        (author, message, date, destination, type, reference_id, read) 
+        VALUES (?, ?, ?, ?, ?, ?, 0)
+    """, (author, message, dt.datetime.now(), destination, notification_type, reference_id))
+    conn.commit()

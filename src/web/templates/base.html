@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <!-- Your custom CSS should come after Bootstrap -->
     <link rel="stylesheet" href="{{url_for('static_dir', filename='static/css/style.css')}}">
+    <!-- Chatbot CSS -->
+    <link rel="stylesheet" href="{{url_for('static_dir', filename='static/css/chatbot.css')}}">
     
     {% block head %}{% endblock %}
 </head>
@@ -61,10 +63,37 @@
                             </li>
                         </ul>
                     </li>
-                    <li class="nav-item">
+                    <!-- <li class="nav-item">
                         <a class="nav-link" href="{{url_for('chatroom')}}">
                             <i class="bi bi-chat-dots"></i> Chat Room
                         </a>
+                    </li> -->
+                    
+                    <!-- Add this right after the Resources dropdown, before the Admin section -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-bell"></i>
+                            <span>
+                                Notifications 
+                            </span>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger notification-badge" style="display: none;">
+                                0
+                            </span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end notification-dropdown" style="width: 300px; max-height: 400px; overflow-y: auto;">
+                            <li>
+                                <h6 class="dropdown-header">Notifications</h6>
+                            </li>
+                            <div id="notificationList">
+                                <!-- Notifications will be loaded here -->
+                            </div>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <a class="dropdown-item text-center" href="{{url_for('notifications')}}">
+                                    View All Notifications
+                                </a>
+                            </li>
+                        </ul>
                     </li>
                     
                     {% if session['admin'] %}
@@ -78,11 +107,11 @@
                                     <i class="bi bi-people"></i> User Management
                                 </a>
                             </li>
-                            <li>
+                            <!-- <li>
                                 <a class="dropdown-item" href="{{url_for('add_user')}}">
                                     <i class="bi bi-person-plus"></i> Add User
                                 </a>
-                            </li>
+                            </li> -->
                             <li>
                                 <a class="dropdown-item" href="{{url_for('logs')}}">
                                     <i class="bi bi-list-ul"></i> Logs
@@ -157,18 +186,85 @@
     <!-- JavaScript Bundle with Popper (required for Bootstrap) -->
     <script>
         // Pass Flask session data to JavaScript
-        const session = {
-            username: "{{ session.username }}",
-            admin: {{ 'true' if session.admin else 'false' }},
-            order_manager: {{ 'true' if session.order_manager else 'false' }}
+        const userSession = {
+            "username": "{{ session.username }}",
+            "admin": {% if session.admin %}true{% else %}false{% endif %},
+            "order_manager": {% if session.order_manager %}true{% else %}false{% endif %}
         };
+    </script>
+    <!-- Add Marked.js for Markdown parsing and DOMPurify for sanitizing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked@5.1.2/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
+    <script>
+      // Initialize marked with options
+      document.addEventListener('DOMContentLoaded', function() {
+        // Check if marked is loaded
+        if (typeof marked !== 'undefined') {
+          console.log('Marked library loaded successfully');
+          // Set default options for marked
+          marked.use({
+            breaks: true,        // Add line breaks on single line breaks
+            gfm: true,           // Use GitHub Flavored Markdown
+          });
+        } else {
+          console.error('Marked library not loaded!');
+          // Define a basic fallback markdown parser
+          window.marked = {
+            parse: function(text) {
+              // Very basic markdown parsing
+              return text
+                // Bold
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                // Italic
+                .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                // Line breaks
+                .replace(/\n/g, '<br>')
+                // Lists
+                .replace(/^- (.*)/gm, '<li>$1</li>')
+                .replace(/<li>.*?<\/li>/gs, function(match) {
+                  return '<ul>' + match + '</ul>';
+                });
+            }
+          };
+        }
+      });
     </script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
     <!-- Your custom scripts -->
     <script src="{{url_for('static_dir', filename='static/js/orders.js')}}"></script>
     <script src="{{url_for('static_dir', filename='static/js/JavaScript.js')}}"></script>
+    <!-- Chatbot script -->
+    <script src="{{url_for('static_dir', filename='static/js/chatbot.js')}}"></script>
     
     {% block scripts %}{% endblock %}
+
+    <!-- Chatbot HTML structure -->
+    <div class="chat-container" id="chatContainer">
+      <div class="chat-header" id="chatHeader">
+        <span><i class="bi bi-robot me-2"></i>nimA</span>
+        <button id="chatToggleBtn" class="btn btn-sm"><i class="bi bi-x"></i></button>
+      </div>
+      <div class="chat-messages" id="chatMessages">
+        <!-- Initial welcome message will be added via JavaScript for proper Markdown rendering -->
+        <div id="modelStatus" class="message system" style="display: none;">
+          <div class="d-flex align-items-center">
+            <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+            <span>Loading LLM model. This may take a moment...</span>
+          </div>
+        </div>
+      </div>
+      <div class="chat-input-container">
+        <input type="text" id="chatInput" class="chat-input" placeholder="Type your message here...">
+        <button id="chatSendBtn" class="btn btn-primary btn-sm"><i class="bi bi-send"></i></button>
+      </div>
+    </div>
+
+    <button id="chatLaunchBtn" class="chat-launch-btn">
+      <i class="bi bi-chat-dots-fill"></i>
+    </button>
+
+    <!-- Add this before the closing </body> tag -->
+    <script src="{{ url_for('static_dir', filename='static/js/table_sorting.js') }}"></script>
 </body>
 </html>

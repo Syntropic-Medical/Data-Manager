@@ -134,7 +134,7 @@
               <td class="align-middle py-3">{{ order.order_assignee }}</td>
               <td class="align-middle py-3">{{ order.order_author }}</td>
               <td class="align-middle py-3">
-                {% if session.admin or session.username == order.order_assignee %}
+                {% if session.username == order.order_assignee %}
                   <select class="form-control status-select" data-order-id="{{ order.id }}">
                     <option value="pending" {% if order.status|lower == 'pending' %}selected{% endif %}>Pending</option>
                     <option value="ordered" {% if order.status|lower == 'ordered' %}selected{% endif %}>Ordered</option>
@@ -310,5 +310,12 @@
       });
     });
   });
+</script>
+
+<script>
+    // Pass Flask session data to JavaScript
+    window.currentUsername = "{{ session.username }}";
+    window.isAdmin = {{ 'true' if session.admin else 'false' }};
+    window.isOrderManager = {{ 'true' if session.order_manager else 'false' }};
 </script>
 {% endblock %}

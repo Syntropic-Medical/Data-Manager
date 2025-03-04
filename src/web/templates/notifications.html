@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card shadow-sm">
+        <div class="card-header bg-light">
+            <h5 class="mb-0"><i class="bi bi-bell me-2"></i>Notifications</h5>
+        </div>
+        <div class="card-body">
+            {% if notifications %}
+                <div class="list-group" id="notificationsList">
+                    {% for notification in notifications %}
+                    <div class="list-group-item notification-item {% if not notification.read %}unread{% endif %}" 
+                         data-notification-id="{{ notification.id }}"
+                         data-notification-type="{{ notification.type }}"
+                         data-reference-id="{{ notification.reference_id }}">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <small class="text-muted">From: {{ notification.author }}</small>
+                            <small class="text-muted">{{ notification.date.split('.')[0][:-3] }}</small>
+                        </div>
+                        <div class="notification-message">
+                            {% if notification.type == 'entry_share' %}
+                                <i class="bi bi-share me-1"></i>
+                            {% elif notification.type == 'order_status' %}
+                                <i class="bi bi-clipboard-check me-1"></i>
+                            {% elif notification.type == 'order_assignment' %}
+                                <i class="bi bi-clipboard-plus me-1"></i>
+                            {% endif %}
+                            {{ notification.message }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% if has_more %}
+                <div class="text-center mt-3">
+                    <button id="loadMoreBtn" class="btn btn-outline-primary">
+                        Show More
+                    </button>
+                </div>
+                {% endif %}
+            {% else %}
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle me-2"></i>No notifications
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentOffset = 10;
+
+$('#loadMoreBtn').click(function() {
+    const $btn = $(this);
+    $btn.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> Loading...');
+    
+    $.get('/api/notifications/load-more', { offset: currentOffset })
+        .done(function(response) {
+            const notifications = response.notifications;
+            
+            notifications.forEach(function(notification) {
+                const formattedDate = notification.date.split('.')[0].slice(0, -3);
+                const notificationIcon = getNotificationIcon(notification.type);
+                
+                const notificationHtml = `
+                    <div class="list-group-item notification-item ${!notification.read ? 'unread' : ''}" 
+                         data-notification-id="${notification.id}"
+                         data-notification-type="${notification.type}"
+                         data-reference-id="${notification.reference_id}">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <small class="text-muted">From: ${notification.author}</small>
+                            <small class="text-muted">${formattedDate}</small>
+                        </div>
+                        <div class="notification-message">
+                            ${notificationIcon}
+                            ${notification.message}
+                        </div>
+                    </div>
+                `;
+                $('#notificationsList').append(notificationHtml);
+            });
+            
+            currentOffset += 10;
+            
+            if (!response.has_more) {
+                $btn.parent().remove();
+            } else {
+                $btn.prop('disabled', false).text('Show More');
+            }
+        })
+        .fail(function() {
+            $btn.prop('disabled', false).text('Show More');
+            alert('Error loading more notifications');
+        });
+});
+
+function getNotificationIcon(type) {
+    switch(type) {
+        case 'entry_share':
+            return '<i class="bi bi-share me-1"></i>';
+        case 'order_status':
+            return '<i class="bi bi-clipboard-check me-1"></i>';
+        case 'order_assignment':
+            return '<i class="bi bi-clipboard-plus me-1"></i>';
+        default:
+            return '';
+    }
+}
+</script>
+{% endblock %} 

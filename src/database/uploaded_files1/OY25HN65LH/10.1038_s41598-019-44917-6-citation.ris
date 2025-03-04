@@ -1,0 +1,18 @@
+TY  - JOUR
+AU  - Abdolhoseini, Mahmoud
+AU  - Kluge, Murielle G.
+AU  - Walker, Frederick R.
+AU  - Johnson, Sarah J.
+PY  - 2019
+DA  - 2019/06/12
+TI  - Segmentation, Tracing, and Quantification of Microglial Cells from 3D Image Stacks
+JO  - Scientific Reports
+SP  - 8557
+VL  - 9
+IS  - 1
+AB  - Microglia play a central role in modulating synaptic structure and physiology, learning and memory processes. They exhibit morphological changes to perform these roles, therefore the morphological study of microglia can help to understand their functionality. Many promising methods are proposed to automatically segment the blood vessels or reconstruct the neuronal morphology. However, they often fail to accurately capture microglia organizations due to the striking structural differences. This requires a more sophisticated approach of reconstruction taking into account the varying nature of branch structures and soma sizes. To this end, we propose an automated method to reconstruct microglia, and quantify their features from 2D/3D image datasets. We first employ multilevel thresholding to segment soma volumes(3D)/areas(2D) and recognize foreground voxels/pixels. Seed points sampled from the foreground, are connected to form the skeleton of the branches via the tracing process. The reconstructed data is quantified and written in SWC standard file format. We have applied our method to 3D image datasets of microglia, then evaluated the results using ground truth data, and compared them to those achieved via the state-of-the-art methods. Our method outperforms the others both in accuracy and computational time.
+SN  - 2045-2322
+UR  - https://doi.org/10.1038/s41598-019-44917-6
+DO  - 10.1038/s41598-019-44917-6
+ID  - Abdolhoseini2019
+ER  - 

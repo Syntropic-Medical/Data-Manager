@@ -422,3 +422,72 @@ $(document).ready(function(){
     });
   }
 });
+
+function loadNotifications() {
+    $.get('/api/notifications/unread')
+        .done(function(response) {
+            const notifications = response.notifications || [];
+            const $notificationList = $('#notificationList');
+            const $badge = $('.notification-badge');
+            
+            $notificationList.empty();
+            
+            if (notifications.length > 0) {
+                $badge.text(notifications.length).show();
+                
+                notifications.forEach(function(notification) {
+                    const notificationHtml = `
+                        <li>
+                            <a href="#" class="dropdown-item notification-item" 
+                              data-notification-id="${notification.id}"
+                              onclick="event.preventDefault();">
+                                <div class="notification-message">${notification.message}</div>
+                                <div class="notification-time">
+                                    <small class="text-muted">From: ${notification.author}</small>
+                                    <small class="text-muted float-end">${new Date(notification.date).toLocaleString()}</small>
+                                </div>
+                            </a>
+                        </li>
+                    `;
+                    $notificationList.append(notificationHtml);
+                });
+            } else {
+                $badge.hide();
+                $notificationList.html('<li><span class="dropdown-item text-muted">No new notifications</span></li>');
+            }
+        })
+        .fail(function(error) {
+            console.error('Error loading notifications:', error);
+        });
+}
+
+// Mark notification as read when clicked
+$(document).on('click', '.notification-item', function(e) {
+    e.preventDefault();
+    const $this = $(this);
+    const notificationId = $this.data('notification-id');
+    
+    // Debug log to check the ID
+    console.log('Marking notification as read:', notificationId);
+    
+    $.ajax({
+        url: '/api/notifications/mark-read',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ id: notificationId }),
+        error: function(xhr, status, error) {
+            console.error('Error marking notification as read:', error);
+            console.error('Response:', xhr.responseText);
+        },
+        success: function() {
+            $this.removeClass('unread');
+            loadNotifications();
+        }
+    });
+});
+
+// Load notifications periodically
+$(document).ready(function() {
+    loadNotifications();
+    setInterval(loadNotifications, 30000); // Refresh every 30 seconds
+});

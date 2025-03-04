@@ -98,29 +98,6 @@ def send_new_order_mail(info):
     """
     send_email(receiver_email, sender_email, password, subject, html)
 
-
-def send_order_notification(info):
-    receiver_email = info['receiver_email']
-    sender_email = info['sender_email']
-    password = info['password']
-    subject = info['subject']
-    txt = info['txt']
-    link2entry = info['link2entry']
-    sender_username = info['sender_username']
-    
-    html = f"""
-    <div>
-    <p>{txt}</p>
-    <br>
-    <a href="https://{link2entry}">View in Orders Dashboard</a>
-    <br>
-    <br>
-    <p>Best regards,</p>
-    <p>The datamanager team</p>
-    </div>
-    """
-    send_email(receiver_email, sender_email, password, subject, html) 
-
 def send_order_status_mail(info):
     receiver_email = info['receiver_email']
     sender_email = info['sender_email']

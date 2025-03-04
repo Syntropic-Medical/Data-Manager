@@ -24,11 +24,7 @@
               </div>
               <div class="card-body pt-0">
                 <div class="row">
-                  <div class="col-md-4 mb-3">
-                    <label for="Hash_ID" class="form-label">Hash ID</label>
-                    <input class="form-control" name="Hash_ID" autocomplete="off">
-                  </div>
-                  
+
                   <div class="col-md-4 mb-3">
                     <label for="Title" class="form-label">Title</label>
                     <div class="position-relative">
@@ -38,12 +34,22 @@
                            style="display:none; max-height: 200px; overflow-y: auto;"></div>
                     </div>
                   </div>
+
+                  <div class="col-md-4 mb-4">
+                    <label for="Author" class="form-label">Author</label>
+                    <div class="position-relative">
+                      <input type="text" class="form-control" id="author_search" name="Author" 
+                             placeholder="Search authors..." autocomplete="off">
+                      <div class="dropdown-menu w-100" id="author_search_datalist" 
+                           style="display:none; max-height: 200px; overflow-y: auto;"></div>
+                    </div>
+                  </div>
                   
                   <div class="col-md-4 mb-3">
                     <label for="date_bool" class="form-label d-block">
                       Date Range
                       <div class="form-check form-switch d-inline-block ms-2">
-                        <input class="form-check-input" type="checkbox" id="date_bool" name="date_bool" checked>
+                        <input class="form-check-input" type="checkbox" id="date_bool" name="date_bool">
                       </div>
                     </label>
                     <div class="input-group">
@@ -71,17 +77,8 @@
               </div>
               <div class="card-body pt-0">
                 <div class="row">
-                  <div class="col-md-4 mb-4">
-                    <label for="Author" class="form-label">Author</label>
-                    <div class="position-relative">
-                      <input type="text" class="form-control" id="author_search" name="Author" 
-                             placeholder="Search authors..." autocomplete="off">
-                      <div class="dropdown-menu w-100" id="author_search_datalist" 
-                           style="display:none; max-height: 200px; overflow-y: auto;"></div>
-                    </div>
-                  </div>
                   
-                  <div class="col-md-4 mb-4">
+                  <div class="col-md-4 mb-3">
                     <label for="Tags" class="form-label">Tags</label>
                     <div class="position-relative">
                       <input type="text" class="form-control" id="tags_search" name="Tags" 
@@ -91,7 +88,7 @@
                     </div>
                   </div>
                   
-                  <div class="col-md-4 mb-4">
+                  <div class="col-md-4 mb-3">
                     <label for="Text" class="form-label">Text</label>
                     <div class="position-relative">
                       <input type="text" class="form-control" id="text_search" name="Text" 
@@ -100,6 +97,11 @@
                            style="display:none; max-height: 200px; overflow-y: auto;"></div>
                     </div>
                   </div>
+                  <div class="col-md-4 mb-3">
+                    <label for="Hash_ID" class="form-label">Hash ID</label>
+                    <input class="form-control" name="Hash_ID" autocomplete="off">
+                  </div>
+                </div>
                 </div>
               </div>
             </div>

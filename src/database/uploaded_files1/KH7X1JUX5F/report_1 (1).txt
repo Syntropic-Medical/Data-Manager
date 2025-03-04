@@ -1,0 +1,8 @@
+Hash ID: OY25HN65LH
+Parent Hash ID: 
+Name: test
+Author: admin
+Date: 2025-03-03
+File Path: frfrf
+Tags: ['']
+Conditions: ['->Species->Human->Human']

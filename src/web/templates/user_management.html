@@ -21,6 +21,7 @@
                             <th>Username</th>
                             <th>Name</th>
                             <th>Email</th>
+                            <th>Email Notifications</th>
                             <th>Roles</th>
                             <th>Actions</th>
                         </tr>
@@ -31,6 +32,7 @@
                             <td>{{user.username}}</td>
                             <td>{{user.name if user.name else '-'}}</td>
                             <td>{{user.email if user.email else '-'}}</td>
+                            <td>{{user.email_enabled|default(1)}}</td>
                             <td>
                                 {% if user.admin %}
                                     <span class="badge bg-primary">Admin</span>
@@ -113,6 +115,15 @@
                                 <input type="email" class="form-control" id="email" name="email" autocomplete="off">
                             </div>
 
+                            <!-- Email notifications -->
+                            <div class="col-md-6">
+                                <label for="email_enabled" class="form-label">Email Notifications</label>
+                                <select class="form-select" name="email_enabled" id="email_enabled" required>
+                                    <option value="1">Enabled</option>
+                                    <option value="0">Disabled</option>
+                                </select>
+                            </div>
+
                             <!-- Submit button -->
                             <div class="col-12">
                                 <button type="submit" class="btn btn-primary">
@@ -173,6 +184,15 @@
                                 <label for="email{{user.id}}" class="form-label">Email</label>
                                 <input type="email" class="form-control" id="email{{user.id}}" name="email" 
                                        value="{{user.email if user.email else ''}}" autocomplete="off">
+                            </div>
+
+                            <!-- Email notifications -->
+                            <div class="col-md-6">
+                                <label for="email_enabled{{user.id}}" class="form-label">Email Notifications</label>
+                                <select class="form-select" name="email_enabled" id="email_enabled{{user.id}}">
+                                    <option value="1" {% if user.email_enabled|default(1) == 1 %}selected{% endif %}>Enabled</option>
+                                    <option value="0" {% if user.email_enabled|default(1) == 0 %}selected{% endif %}>Disabled</option>
+                                </select>
                             </div>
 
                             {% if session['admin'] %}

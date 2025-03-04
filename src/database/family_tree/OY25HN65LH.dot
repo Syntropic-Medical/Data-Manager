@@ -1,0 +1,3 @@
+strict digraph {
+test [color=blue, URL="/entry/1"];
+}

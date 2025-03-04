@@ -543,4 +543,75 @@ div.PanelLogin{
   }
 }
 
+/* Update notification styles */
+.notification-item {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #e9ecef;
+    white-space: normal;
+}
+
+.notification-item:hover {
+    background-color: #f8f9fa;
+}
+
+.notification-item.unread {
+    background-color: #e8f4fe;
+}
+
+.notification-item .notification-message {
+    font-size: 0.875rem;
+    color: #212529;
+    margin-bottom: 0.25rem;
+}
+
+.notification-item .notification-message i {
+    color: #6c757d;
+}
+
+/* Add specific colors for different notification types */
+.notification-item[data-notification-type="entry_share"] .notification-message i {
+    color: #28a745;
+}
+
+.notification-item[data-notification-type="order_status"] .notification-message i {
+    color: #ffc107;
+}
+
+.notification-item[data-notification-type="order_assignment"] .notification-message i {
+    color: #17a2b8;
+}
+
+.notification-badge {
+    font-size: 0.75rem;
+    transform: translate(-50%, -50%) !important;
+}
+
+/* Table sorting styles */
+.sortable {
+    position: relative;
+}
+
+.sort-indicator {
+    font-size: 0.8em;
+    opacity: 0.6;
+}
+
+th[data-sort="asc"] .sort-indicator,
+th[data-sort="desc"] .sort-indicator {
+    opacity: 1;
+}
+
+/* Make sure the table headers have proper padding for the sort indicators */
+.table-sortable th {
+    padding-right: 1.5rem;
+    position: relative;
+}
+
+.table-sortable th .sort-indicator {
+    position: absolute;
+    right: 0.5rem;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
 

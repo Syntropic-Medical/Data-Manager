@@ -36,6 +36,15 @@
                        value="{{user['email'] if user['email'] else ''}}" autocomplete="off">
             </div>
 
+            <!-- Email enabled field -->
+            <div class="col-md-6">
+                <label for="email_enabled" class="form-label">Email Notifications</label>
+                <select class="form-select" name="email_enabled" id="email_enabled">
+                    <option value="1" {% if user['email_enabled']|default(1) == 1 %}selected{% endif %}>Enabled</option>
+                    <option value="0" {% if user['email_enabled']|default(1) == 0 %}selected{% endif %}>Disabled</option>
+                </select>
+            </div>
+
             {% if session['admin'] %}
             <!-- Admin selection -->
             <div class="col-md-6">

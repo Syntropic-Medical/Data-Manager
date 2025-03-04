@@ -241,7 +241,7 @@ window.applyAllFilters = function() {
             // Add new rows
             response.orders.forEach(function(order, index) {
                 const sessionData = getSessionData();
-                const statusHtml = (sessionData.admin || sessionData.username === order.order_assignee) ?
+                const statusHtml = (sessionData.username === order.order_assignee) ?
                     `<select class="form-control status-select" data-order-id="${order.id}">
                         <option value="pending" ${order.status.toLowerCase() === 'pending' ? 'selected' : ''}>Pending</option>
                         <option value="ordered" ${order.status.toLowerCase() === 'ordered' ? 'selected' : ''}>Ordered</option>
@@ -319,8 +319,6 @@ function initializeStatusSelects() {
 
 // Function to get session data
 function getSessionData() {
-    // This function should be implemented to return the current user's session data
-    // For now, we'll just return a placeholder
     return {
         username: window.currentUsername || '',
         admin: window.isAdmin || false

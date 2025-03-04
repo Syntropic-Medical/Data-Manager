@@ -36,6 +36,7 @@ class database_configs():
                                         order_manager bool NOT NULL default 0,
                                         name text,
                                         email text,
+                                        email_enabled bool NOT NULL default 1,
                                         id integer primary key autoincrement
                                     ); """,
         """ CREATE TABLE IF NOT EXISTS conditions_templates (
@@ -44,12 +45,23 @@ class database_configs():
                                         conditions text NOT NULL,
                                         id integer primary key autoincrement
                                     ); """,
-        """ CREATE TABLE IF NOT EXISTS messages (
+        """ CREATE TABLE IF NOT EXISTS notifications (
+                                        id integer primary key autoincrement,
                                         author text NOT NULL,
                                         message text NOT NULL,
                                         date text NOT NULL,
                                         destination text NOT NULL,
-                                        id integer primary key autoincrement
+                                        read integer DEFAULT 0,
+                                        type text NOT NULL,
+                                        reference_id integer
+                                    ); """,
+        """ CREATE TABLE IF NOT EXISTS messages (
+                                        id integer primary key autoincrement,
+                                        author text NOT NULL,
+                                        message text NOT NULL,
+                                        date text NOT NULL,
+                                        destination text NOT NULL,
+                                        read integer DEFAULT 0
                                     ); """,
         """ CREATE TABLE IF NOT EXISTS logs (
                                         username text NOT NULL,

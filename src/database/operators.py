@@ -242,8 +242,26 @@ def update_user(conn, form_data, user_id):
             
         if 'order_manager' in form_data:
             update_fields.append('order_manager = ?')
-            params.append(form_data['order_manager'] == 'True')
+            params.append(form_data['order_manager'])
             
+        if 'email_enabled' in form_data:
+            update_fields.append('email_enabled = ?')
+            params.append(int(form_data['email_enabled']))
+
+        if 'password' in form_data:
+            update_fields.append('password = ?')
+            params.append(form_data['password'])
+    
+        if 'admin' in form_data:    
+            update_fields.append('admin = ?')
+            params.append(form_data['admin'])
+
+        print(f"""
+                UPDATE users 
+                SET {', '.join(update_fields)}
+                WHERE id = ?
+            """, params)
+
         if update_fields:
             params.append(user_id)
             cursor.execute(f"""

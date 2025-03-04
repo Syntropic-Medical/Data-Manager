@@ -33,6 +33,11 @@ import waitress
 
 from datetime import datetime
 
+from llm_search import ExternalLLMSearch, execute_llm_search
+
+import requests
+
+
 def add_admin(db_configs, app_configs):
     conn = db_configs.conn
     cursor = conn.cursor()
@@ -75,6 +80,20 @@ class WebApp():
         self.ChatRoom = chatroom.ChatRoom(self.db_configs)
 
         add_admin(self.db_configs, self.app.config)
+
+        # Use Claude API for search
+        self.llm_search = ExternalLLMSearch(api_key=os.environ.get("CLAUDE_API_KEY"))
+
+        # Add a notice about API key if it's not set
+        if not self.llm_search.ready:
+            print("=" * 80)
+            print("WARNING: Claude API key not set. Set the CLAUDE_API_KEY environment variable.")
+            print("The search will use a basic keyword extraction as fallback.")
+            print("=" * 80)
+
+        # Import and run database migrations
+        from database.migrate import migrate_database
+        migrate_database()
 
         print(f'App initialized. Server running on http://{self.ip}:{self.port}')
     
@@ -147,8 +166,8 @@ class WebApp():
                 entries_dict_list.append({
                     'hash_id': entry[0],
                     'tags': entry[1],
-                    'author': entry[4],
-                    'date': entry[5],
+                    'author': entry[5],
+                    'date': entry[4],
                     'conditions': entry[6],
                     'title': entry[7],
                     'id': entry[-1]
@@ -212,51 +231,30 @@ class WebApp():
     
         @app.route("/update_user_in_db/<int:id>", methods=['POST', 'GET'])
         @security.login_required
-        @self.logger
+        # @self.logger
         def update_user_in_db(id):
             if flask.request.method == 'POST':
-                password = flask.request.form['password']
-                repeat_password = flask.request.form['repeat_password']
+                form_data = {
+                    'password': flask.request.form['password'],
+                    'name': flask.request.form['name'],
+                    'email': flask.request.form['email'],
+                    'email_enabled': flask.request.form['email_enabled']
+                }
                 if flask.session['admin']:
-                    admin = flask.request.form['admin']
-                else:
-                    admin = 0
-                name = flask.request.form['name']
-                email = flask.request.form['email']
-                order_manager = flask.request.form['order_manager']
-
-                if password == '' or admin == '' or order_manager == '':
-                    flask.flash('Please fill all the fields')
-                    user = flask.request.form
-                    return flask.render_template('profile.html', user=user)
-
-                if password != repeat_password:
+                    form_data['admin'] = int(flask.request.form['admin'])
+                    form_data['order_manager'] = int(flask.request.form['order_manager'])
+                    
+                # Validate password
+                if form_data['password'] != flask.request.form['repeat_password']:
                     flask.flash('Passwords do not match')
-                    user = flask.request.form
-                    return flask.render_template('profile.html', user=user)
-                print(order_manager, admin)
-                try:
-                    order_manager = int(order_manager)
-                    admin = int(admin)
-                except:
-                    flask.flash('Invalid input')
-                    user = flask.request.form
-                    return flask.render_template('profile.html', user=user)
-
-                conn = self.db_configs.conn
-                cursor = conn.cursor()
-                cursor.execute('select * from users where id=?', (id,))
-                users = cursor.fetchall()
-
-                if len(users)==0:
-                    flask.flash('Username does not exist')
-                    user = flask.request.form
-                    return flask.render_template('profile.html', user=user)
-
-                else:
-                    cursor.execute('update users set password=?, admin=?, name=?, email=?, order_manager=? where id=?', (password, admin, name, email, order_manager, id))
-                    conn.commit()
+                    return flask.redirect(flask.url_for('profile'))
+                
+                success = operators.update_user(self.db_configs.conn, form_data, id)
+                if success:
                     flask.flash('User updated successfully')
+                    return flask.redirect(flask.url_for('user_management'))
+                else:
+                    flask.flash('Error updating user')
                     return flask.redirect(flask.url_for('user_management'))
 
         @app.route("/delete_user/<int:id>", methods=['POST', 'GET'])
@@ -310,8 +308,8 @@ class WebApp():
                     entries_dict_list.append({
                         'hash_id': entry[0],
                         'tags': entry[1],
-                        'author': entry[4],
-                        'date': entry[5],
+                        'author': entry[5],
+                        'date': entry[4],
                         'conditions': entry[6],
                         'title': entry[7],
                         'id': entry[-1]
@@ -566,7 +564,11 @@ class WebApp():
                              os.path.join('static', 'css', 'style.css'), 
                              os.path.join('static', 'css', 'bootstrap.min.css'),
                              os.path.join('static', 'assets', 'loading.gif'),
-                             os.path.join('static', 'js', 'orders.js')]
+                             os.path.join('static', 'js', 'orders.js'),
+                             os.path.join('static', 'js', 'chatbot.js'),
+                             os.path.join('static', 'css', 'chatbot.css'),
+                             os.path.join('static', 'js', 'table_sorting.js')]
+            
             if filename in allowed_files:
                 return flask.send_from_directory(app.root_path, filename)
             else:
@@ -648,15 +650,19 @@ class WebApp():
                     
                 # Process email notifications
                 email_addresses = []
+                user_list = []  # Keep track of usernames for notifications
                 for user_name in user_names.split(','):
                     user_name = user_name.strip()
                     if user_name:
                         email = utils.get_email_address_by_user_name(self.db_configs.conn, user_name)
-                        email_addresses.append(email)
+                        if email:
+                            email_addresses.append(email)
+                            user_list.append(user_name)
 
                 if not utils.check_emails_validity(email_addresses):
                     flask.flash('No valid email addresses found for the specified users')
                     return flask.redirect(flask.url_for('entries'))
+
                 success_count = 0
                 for id in entries_ids:
                     entry_report = utils.entry_report_maker(self.db_configs.conn, id)
@@ -665,7 +671,12 @@ class WebApp():
                     sender_email_address = self.app.config['CREDS_FILE']['SENDER_EMAIL_ADDRESS']
                     sender_username = flask.session['username']
                     
-                    for receiver_email_address in email_addresses:
+                    # Get entry name for notification
+                    cursor = self.db_configs.conn.cursor()
+                    cursor.execute("SELECT entry_name FROM entries WHERE id=?", (id,))
+                    entry_name = cursor.fetchone()[0]
+                    
+                    for idx, receiver_email_address in enumerate(email_addresses):
                         args = {
                             'receiver_email': receiver_email_address, 
                             'sender_email': sender_email_address, 
@@ -677,6 +688,15 @@ class WebApp():
                         }
                         if mailing.send_report_mail(args):
                             success_count += 1
+                            # Create notification for the user
+                        utils.add_notification(
+                            self.db_configs.conn,
+                            sender_username,
+                            f"Entry '{entry_name}' has been shared with you",
+                            user_list[idx],
+                            'entry_share',
+                            id
+                            )
                 
                 if success_count > 0:
                     flask.flash(f'Successfully sent {success_count} email notifications')
@@ -819,7 +839,7 @@ class WebApp():
             
             # Execute the query
             cursor = self.db_configs.conn.cursor()
-            cursor.execute(query, params)
+            cursor.execute(query, tuple(params))
             orders = cursor.fetchall()
             
             # Convert to dict with column names
@@ -886,7 +906,7 @@ class WebApp():
             
             # Execute the query
             cursor = self.db_configs.conn.cursor()
-            cursor.execute(query, params)
+            cursor.execute(query, tuple(params))
             orders = cursor.fetchall()
             
             # Convert to dict with column names
@@ -898,7 +918,7 @@ class WebApp():
 
         @app.route('/submit_order', methods=['POST'])
         @security.login_required
-        @self.logger
+        # @self.logger
         def submit_order():
             order_data = {
                 'order_name': flask.request.form['order_name'],
@@ -938,6 +958,15 @@ class WebApp():
                         'sender_username': flask.session['username']
                     }
                     mailing.send_new_order_mail(mail_args)
+                
+                # Add notification
+                utils.add_notification(
+                    self.db_configs.conn,
+                    flask.session['username'],
+                    f"New order assigned: {order_data['order_name']}",
+                    order_data['order_assignee'],
+                    'order_assignment'
+                )
             
             flask.flash('Order submitted successfully')
             return flask.redirect(flask.url_for('orders'))
@@ -1005,8 +1034,16 @@ class WebApp():
                         }
                         mailing.send_order_status_mail(mail_args)
                 
+                # Add notification
+                utils.add_notification(
+                    self.db_configs.conn,
+                    flask.session['username'],
+                    f"Order '{order_dict['order_name']}' status updated to {new_status}",
+                    order_dict['order_author'],
+                    'order_status',
+                    order_id
+                )
 
-                
                 # Return success response
                 return flask.jsonify({'success': True})
             except Exception as e:
@@ -1179,6 +1216,16 @@ class WebApp():
                 else:
                     flask.flash('Failed to send email. Please try again later.')
                 
+                # Add notification
+                utils.add_notification(
+                    self.db_configs.conn,
+                    flask.session['username'],
+                    f"New entry shared with you: {entry[7]}",
+                    entry[4],
+                    'entry_share',
+                    id
+                )
+                
                 return flask.redirect(flask.url_for('entry', id=id))
             
             except Exception as e:
@@ -1204,6 +1251,300 @@ class WebApp():
         def title_search():
             searchbox = flask.request.form.get("text")
             return search_engine.title_search_in_db(conn=self.db_configs.conn, keyword=searchbox)
+
+        @app.route("/llm_search", methods=["POST"])
+        @security.login_required
+        def llm_search():
+            """
+            Handle LLM-based search requests from the chat interface
+            """
+            # First check if LLM is ready
+            if not hasattr(self, 'llm_search') or not self.llm_search.ready:
+                return flask.jsonify({
+                    "success": False,
+                    "message": "The nimA assistant is not available. The model failed to load due to system constraints."
+                })
+            
+            try:
+                user_query = flask.request.json.get("query", "")
+                
+                if not user_query.strip():
+                    return flask.jsonify({
+                        "success": False,
+                        "message": "Please provide a search query or ask me how to use the software."
+                    })
+                
+                # Check if query is about how to use a specific page
+                page_keywords = {
+                    "entries": "entries.html",
+                    "entry list": "entries_list.html",
+                    "entry details": "entry.html",
+                    "insert entry": "insert_entry.html",
+                    "add entry": "insert_entry.html",
+                    "user management": "user_management.html",
+                    "user profile": "user_profile_template.html",
+                    "notifications": "notifications.html",
+                    "orders": "orders.html",
+                    "chat": "chat_room.html",
+                    "conditions": "conditions.html",
+                    "backup": "backup.html",
+                    "logs": "logs.html",
+                    "login": "login.html"
+                }
+                
+                how_to_patterns = ["how to", "how do i", "how can i", "help with", "guide for", "instructions for"]
+                
+                for pattern in how_to_patterns:
+                    if pattern in user_query.lower():
+                        for keyword, template in page_keywords.items():
+                            if keyword in user_query.lower():
+                                # Get instructions for the specific page
+                                try:
+                                    template_path = os.path.join(os.path.dirname(__file__), "templates", template)
+                                    if os.path.exists(template_path):
+                                        with open(template_path, 'r') as file:
+                                            html_content = file.read()
+                                            
+                                        # Send the HTML content to the LLM to generate instructions
+                                        instruction_prompt = f"""
+                                        You are nimA, a helpful assistant for the Data Manager software.
+                                        
+                                        A user has asked for help with the {keyword} page. Below is the HTML of that page.
+                                        Based on this HTML, provide clear instructions on how to use this page.
+                                        
+                                        Focus on:
+                                        1. What the page is for
+                                        2. What actions users can take
+                                        3. How to use the main features
+                                        
+                                        DO NOT mention HTML, code, or implementation details in your response.
+                                        DO NOT include any HTML tags in your response.
+                                        Speak directly to the user about the interface elements they can see.
+                                        
+                                        HTML content:
+                                        {html_content[:5000]}  # Limit content size
+                                        """
+                                        
+                                        # Use the same Claude API call pattern as in extract_search_params
+                                        headers = {
+                                            "Content-Type": "application/json",
+                                            "x-api-key": self.llm_search.api_key,
+                                            "anthropic-version": "2023-06-01"
+                                        }
+                                        
+                                        payload = {
+                                            "model": "claude-3-haiku-20240307",
+                                            "messages": [
+                                                {"role": "user", "content": instruction_prompt}
+                                            ],
+                                            "temperature": 0.1,
+                                            "max_tokens": 1000
+                                        }
+                                        
+                                        response = requests.post(
+                                            "https://api.anthropic.com/v1/messages",
+                                            headers=headers,
+                                            json=payload,
+                                            timeout=15
+                                        )
+                                        
+                                        if response.status_code == 200:
+                                            result = response.json()
+                                            if "content" in result and len(result["content"]) > 0:
+                                                response_text = ""
+                                                for content_block in result["content"]:
+                                                    if content_block["type"] == "text":
+                                                        response_text += content_block["text"]
+                                                
+                                                return flask.jsonify({
+                                                    "success": True,
+                                                    "entries": [],
+                                                    "message": response_text.strip()
+                                                })
+                                except Exception as e:
+                                    print(f"Error generating page instructions: {str(e)}")
+                                    # Continue with normal processing if this fails
+                
+                # Use a simplified approach without threading
+                try:
+                    # Extract search parameters using LLM with a timeout
+                    import time
+                    start_time = time.time()
+                    search_params = self.llm_search.extract_search_params(user_query)
+                    print(f"LLM processing took {time.time() - start_time:.2f} seconds")
+                    
+                    if not search_params:
+                        return flask.jsonify({
+                            "success": False,
+                            "message": "**I couldn't understand your query.**\n\nI'm designed to help with software usage and searching for entries. Could you please rephrase your question?"
+                        })
+                        
+                    # Execute the search based on the parameters
+                    entries_list = execute_llm_search(self.db_configs.conn, search_params)
+                    
+                    # Check if this is a usage question rather than a search
+                    if search_params.get("is_usage_question"):
+                        return flask.jsonify({
+                            "success": True,
+                            "entries": [],
+                            "message": search_params.get("explanation", "I'll help you with using the software.")
+                        })
+                    
+                    # Convert entries from tuples to dictionaries with named keys
+                    entries_dict_list = []
+                    for entry in entries_list:
+                        entries_dict_list.append({
+                            'hash_id': entry[0],
+                            'tags': entry[1],
+                            'author': entry[4],
+                            'date': entry[5],
+                            'conditions': entry[6],
+                            'title': entry[7],
+                            'id': entry[-1]
+                        })
+                    
+                    return flask.jsonify({
+                        "success": True,
+                        "entries": entries_dict_list,
+                        "message": search_params.get("explanation", "**Here are the search results** based on your query.")
+                    })
+                    
+                except Exception as e:
+                    print(f"Error in LLM processing: {str(e)}")
+                    import traceback
+                    traceback.print_exc()
+                    return flask.jsonify({
+                        "success": False,
+                        "message": f"**There was a problem processing your request:**\n\n{str(e)}\n\nPlease try again with a different query."
+                    })
+                
+            except Exception as e:
+                print(f"Error in LLM search route: {str(e)}")
+                return flask.jsonify({
+                    "success": False,
+                    "message": "An error occurred. Please try again with a simpler query."
+                })
+
+        @app.route("/llm_status", methods=["GET"])
+        @security.login_required
+        def llm_status():
+            """
+            Check if the LLM model is loaded and ready
+            """
+            return flask.jsonify({
+                "ready": self.llm_search.ready
+            })
+
+        @app.route('/notifications')
+        @security.login_required
+        def notifications():
+            limit = 10  # Initial number of notifications to show
+            cursor = self.db_configs.conn.cursor()
+            cursor.execute("""
+                SELECT id, author, message, date, read, type, reference_id 
+                FROM notifications 
+                WHERE destination = ? 
+                ORDER BY date DESC
+                LIMIT ?
+            """, (flask.session['username'], limit))
+            notifications_raw = cursor.fetchall()
+            
+            # Get total count for checking if more exist
+            cursor.execute("""
+                SELECT COUNT(*) 
+                FROM notifications 
+                WHERE destination = ?
+            """, (flask.session['username'],))
+            total_count = cursor.fetchone()[0]
+            
+            notifications = [
+                {
+                    'id': row[0],
+                    'author': row[1],
+                    'message': row[2],
+                    'date': row[3],
+                    'read': row[4],
+                    'type': row[5],
+                    'reference_id': row[6]
+                } for row in notifications_raw
+            ]
+            
+            has_more = total_count > limit
+            
+            return flask.render_template('notifications.html', 
+                                       notifications=notifications,
+                                       has_more=has_more)
+
+        @app.route('/api/notifications/load-more', methods=['GET'])
+        @security.login_required
+        def load_more_notifications():
+            offset = int(flask.request.args.get('offset', 0))
+            limit = 10
+            
+            cursor = self.db_configs.conn.cursor()
+            cursor.execute("""
+                SELECT id, author, message, date, read, type, reference_id 
+                FROM notifications 
+                WHERE destination = ? 
+                ORDER BY date DESC
+                LIMIT ? OFFSET ?
+            """, (flask.session['username'], limit, offset))
+            notifications_raw = cursor.fetchall()
+            
+            # Get total count for checking if more exist
+            cursor.execute("""
+                SELECT COUNT(*) 
+                FROM notifications 
+                WHERE destination = ?
+            """, (flask.session['username'],))
+            total_count = cursor.fetchone()[0]
+            
+            notifications = [
+                {
+                    'id': row[0],
+                    'author': row[1],
+                    'message': row[2],
+                    'date': row[3],
+                    'read': row[4],
+                    'type': row[5],
+                    'reference_id': row[6]
+                } for row in notifications_raw
+            ]
+            
+            return flask.jsonify({
+                'notifications': notifications,
+                'has_more': total_count > (offset + limit)
+            })
+
+        @app.route('/api/notifications/mark-read', methods=['POST'])
+        @security.login_required
+        def mark_notification_read():
+            if not flask.request.is_json:
+                return flask.jsonify({'error': 'Content-Type must be application/json'}), 415
+            
+            data = flask.request.get_json()
+            notification_id = data.get('id')
+            
+            if not notification_id:
+                return flask.jsonify({'error': 'Missing notification id'}), 400
+            
+            try:
+                notification_id = int(notification_id)
+            except (TypeError, ValueError):
+                return flask.jsonify({'error': 'Invalid notification id format'}), 400
+            
+            cursor = self.db_configs.conn.cursor()
+            cursor.execute("""
+                UPDATE notifications 
+                SET read = 1 
+                WHERE id = ? AND destination = ?
+            """, (notification_id, flask.session['username']))
+            self.db_configs.conn.commit()
+            
+            if cursor.rowcount == 0:
+                return flask.jsonify({'error': 'No notification found with given id'}), 404
+            
+            return flask.jsonify({'success': True})
 
         t = Thread(target=waitress.serve, args=([self.app]), kwargs={'host':self.ip, 'port':self.port, 'threads':self.num_threads})
         t.start()        

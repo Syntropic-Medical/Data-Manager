@@ -10,3 +10,4 @@ wtforms
 networkx
 pydot
 waitress
+llama-cpp-python==0.2.11
