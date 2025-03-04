@@ -78,6 +78,21 @@ def send_report_mail(info):
     """
     return send_email(receiver_email, sender_email, password, subject, html)
 
+def send_password_reset_mail(info):
+    receiver_email = info['receiver_email']
+    sender_email = info['sender_email']
+    password = info['password']
+    subject = info['subject']
+    txt = info['txt']
+
+    html = f"""
+    <div>
+    <p> {txt} </p>
+    <br>
+    </div>
+    """
+    return send_email(receiver_email, sender_email, password, subject, html)
+
 def send_new_order_mail(info):
     receiver_email = info['receiver_email']
     sender_email = info['sender_email']

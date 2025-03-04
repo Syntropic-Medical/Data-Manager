@@ -614,4 +614,49 @@ th[data-sort="desc"] .sort-indicator {
     transform: translateY(-50%);
 }
 
+/* Fixed width table columns with text overflow handling - simplified approach */
+.table-fixed-width {
+    table-layout: fixed;
+    width: 100%;
+}
+
+.table-fixed-width th,
+.table-fixed-width td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 0;
+    vertical-align: middle;
+    padding: 0.75rem;
+}
+
+.table-fixed-width td a,
+.table-fixed-width td span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+}
+
+/* Add a visual indicator for truncated text */
+.table-fixed-width td {
+    position: relative;
+}
+
+.table-fixed-width td:not(.text-center):after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 20px;
+    background: linear-gradient(to right, rgba(255,255,255,0), rgba(255,255,255,1));
+    pointer-events: none;
+}
+
+/* Style for tooltip cursor */
+.table-fixed-width td[title]:not([title=""]) {
+    cursor: help;
+}
+
 

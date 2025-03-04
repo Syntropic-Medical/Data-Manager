@@ -15,7 +15,7 @@
     <div class="col-lg-12">
       <div class="card shadow-sm mb-4">
         <div class="card-body p-4">
-          <form action="/entries" method="post" enctype="multipart/form-data">
+          <form id="searchForm" action="/entries" method="post" enctype="multipart/form-data">
             
             <!-- Basic Search Section -->
             <div class="card mb-4 border-0 bg-light">
@@ -25,47 +25,26 @@
               <div class="card-body pt-0">
                 <div class="row">
 
-                  <div class="col-md-4 mb-3">
-                    <label for="Title" class="form-label">Title</label>
+                  <div class="col-md-6 mb-3">
+                    <label for="Keyword" class="form-label">Keyword</label>
                     <div class="position-relative">
-                      <input type="text" class="form-control" id="title_search" name="Title" 
-                             placeholder="Search titles..." autocomplete="off">
-                      <div class="dropdown-menu w-100" id="title_search_datalist" 
+                      <input type="text" class="form-control realtime-search" id="keyword_search" name="Keyword" 
+                             placeholder="Search across titles, tags, text..." autocomplete="off">
+                      <div class="dropdown-menu w-100" id="keyword_search_datalist" 
                            style="display:none; max-height: 200px; overflow-y: auto;"></div>
                     </div>
                   </div>
 
-                  <div class="col-md-4 mb-4">
+                  <div class="col-md-6 mb-4">
                     <label for="Author" class="form-label">Author</label>
                     <div class="position-relative">
-                      <input type="text" class="form-control" id="author_search" name="Author" 
+                      <input type="text" class="form-control realtime-search" id="author_search" name="Author" 
                              placeholder="Search authors..." autocomplete="off">
                       <div class="dropdown-menu w-100" id="author_search_datalist" 
                            style="display:none; max-height: 200px; overflow-y: auto;"></div>
                     </div>
                   </div>
                   
-                  <div class="col-md-4 mb-3">
-                    <label for="date_bool" class="form-label d-block">
-                      Date Range
-                      <div class="form-check form-switch d-inline-block ms-2">
-                        <input class="form-check-input" type="checkbox" id="date_bool" name="date_bool">
-                      </div>
-                    </label>
-                    <div class="input-group">
-                        <input type="date" class="form-control" id="date_start" name="date_start" 
-                        min="2000-01-01" max="2099-12-31" value="{{dates[0]}}">
-                      <div class="input-group-append input-group-prepend">
-                        <span class="input-group-text">to</span>
-                      </div>
-                      <input type="date" class="form-control" id="date_end" name="date_end" 
-                           min="2000-01-01" max="2099-12-31" value="{{dates[1]}}">
-                    </div>
-                  </div>
-
-
-
-
                 </div>
               </div>
             </div>
@@ -73,48 +52,69 @@
             <!-- Advanced Search Section -->
             <div class="card mb-4 border-0 bg-light">
               <div class="card-header bg-light border-bottom-0">
-                <h5 class="mb-0"><i class="fa fa-filter mr-2"></i>Advanced Search</h5>
-              </div>
-              <div class="card-body pt-0">
-                <div class="row">
-                  
-                  <div class="col-md-4 mb-3">
-                    <label for="Tags" class="form-label">Tags</label>
-                    <div class="position-relative">
-                      <input type="text" class="form-control" id="tags_search" name="Tags" 
-                             placeholder="Search tags..." autocomplete="off">
-                      <div class="dropdown-menu w-100" id="tags_search_datalist" 
-                           style="display:none; max-height: 200px; overflow-y: auto;"></div>
-                    </div>
-                  </div>
-                  
-                  <div class="col-md-4 mb-3">
-                    <label for="Text" class="form-label">Text</label>
-                    <div class="position-relative">
-                      <input type="text" class="form-control" id="text_search" name="Text" 
-                             placeholder="Search text..." autocomplete="off">
-                      <div class="dropdown-menu w-100" id="text_search_datalist" 
-                           style="display:none; max-height: 200px; overflow-y: auto;"></div>
-                    </div>
-                  </div>
-                  <div class="col-md-4 mb-3">
-                    <label for="Hash_ID" class="form-label">Hash ID</label>
-                    <input class="form-control" name="Hash_ID" autocomplete="off">
-                  </div>
-                </div>
+                <div class="d-flex justify-content-between align-items-center">
+                  <h5 class="mb-0"><i class="fa fa-filter mr-2"></i>Advanced Search</h5>
+                  <button class="btn btn-sm btn-outline-secondary" type="button" id="advancedSearchToggle">
+                    <i class="bi bi-chevron-down fs-5" id="collapseIcon"></i>
+                  </button>
                 </div>
               </div>
-            </div>
-            
-            <!-- Conditions Section -->
-            <div class="card mb-4 border-0 bg-light">
-              <div class="card-header bg-light border-bottom-0">
-                <h5 class="mb-0"><i class="fa fa-sliders-h mr-2"></i>Conditions</h5>
-              </div>
-              <div class="card-body pt-0">
-                <div class="row">
-                  <div class="col-md-12">
-                    {{conditions_html}}
+              <div id="advancedSearchCollapse" style="display: none;">
+                <div class="card-body pt-0">
+                  <div class="row">
+                    
+                    <div class="col-md-4 mb-3">
+                      <label for="Title" class="form-label">Title</label>
+                      <div class="position-relative">
+                        <input type="text" class="form-control realtime-search" id="title_search" name="Title" 
+                               placeholder="Search titles..." autocomplete="off">
+                        <div class="dropdown-menu w-100" id="title_search_datalist" 
+                             style="display:none; max-height: 200px; overflow-y: auto;"></div>
+                      </div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                      <label for="Tags" class="form-label">Tags</label>
+                      <div class="position-relative">
+                        <input type="text" class="form-control realtime-search" id="tags_search" name="Tags" 
+                               placeholder="Search tags..." autocomplete="off">
+                        <div class="dropdown-menu w-100" id="tags_search_datalist" 
+                             style="display:none; max-height: 200px; overflow-y: auto;"></div>
+                      </div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                      <label for="Text" class="form-label">Text</label>
+                      <div class="position-relative">
+                        <input type="text" class="form-control realtime-search" id="text_search" name="Text" 
+                               placeholder="Search text..." autocomplete="off">
+                        <div class="dropdown-menu w-100" id="text_search_datalist" 
+                             style="display:none; max-height: 200px; overflow-y: auto;"></div>
+                      </div>
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                      <label for="Hash_ID" class="form-label">Hash ID</label>
+                      <input class="form-control realtime-search" name="Hash_ID" id="hash_id_search" autocomplete="off">
+                    </div>
+                    
+                    <div class="col-md-4 mb-3">
+                      <label for="date_bool" class="form-label d-block">
+                        Date Range
+                        <div class="form-check form-switch d-inline-block ms-2">
+                          <input class="form-check-input realtime-search" type="checkbox" id="date_bool" name="date_bool">
+                        </div>
+                      </label>
+                      <div class="input-group">
+                          <input type="date" class="form-control realtime-search" id="date_start" name="date_start" 
+                          min="2000-01-01" max="2099-12-31" value="{{dates[0]}}">
+                        <div class="input-group-append input-group-prepend">
+                          <span class="input-group-text">to</span>
+                        </div>
+                        <input type="date" class="form-control realtime-search" id="date_end" name="date_end" 
+                             min="2000-01-01" max="2099-12-31" value="{{dates[1]}}">
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -126,7 +126,7 @@
                 <button class="btn btn-primary me-2" type="submit">
                   <i class="bi bi-search me-1"></i> Search Entries
                 </button>
-                <button type="reset" class="btn btn-secondary me-2">
+                <button type="reset" class="btn btn-secondary me-2" id="resetFormBtn">
                   <i class="bi bi-x-circle me-1"></i> Reset Form
                 </button>
               </div>
@@ -136,16 +136,21 @@
       </div>
       
       <!-- Results Section -->
-      {% if entries_html %}
-      <div class="card shadow-sm">
+      <div class="card shadow-sm" id="resultsCard" {% if not entries_html %}style="display: none;"{% endif %}>
         <div class="card-header bg-light">
           <h5 class="mb-0"><i class="fa fa-list mr-2"></i>Search Results</h5>
         </div>
-        <div class="card-body p-0">
-          {{entries_html}}
+        <div class="card-body p-0" id="resultsContainer">
+          {% if entries_html %}
+            {{entries_html}}
+          {% endif %}
+        </div>
+        <div class="card-footer text-center" id="loadMoreContainer" {% if not show_more_button %}style="display: none;"{% endif %}>
+          <button id="loadMoreResults" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-down-circle me-1"></i> Show More Results
+          </button>
         </div>
       </div>
-      {% endif %}
     </div>
   </div>
 </div>
@@ -168,6 +173,246 @@
       // Initialize on page load
       updateDateFields();
     }
+    
+    // Manual toggle for advanced search section
+    const advancedSearchToggle = document.getElementById('advancedSearchToggle');
+    const advancedSearchCollapse = document.getElementById('advancedSearchCollapse');
+    const collapseIcon = document.getElementById('collapseIcon');
+    
+    advancedSearchToggle.addEventListener('click', function() {
+      const isVisible = advancedSearchCollapse.style.display !== 'none';
+      
+      if (isVisible) {
+        advancedSearchCollapse.style.display = 'none';
+        collapseIcon.classList.remove('bi-chevron-up');
+        collapseIcon.classList.add('bi-chevron-down');
+      } else {
+        advancedSearchCollapse.style.display = 'block';
+        collapseIcon.classList.remove('bi-chevron-down');
+        collapseIcon.classList.add('bi-chevron-up');
+      }
+    });
+    
+    // Real-time search functionality
+    let searchTimeout;
+    const searchDelay = 300; // milliseconds
+    let currentOffset = 0;
+    
+    // Function to perform real-time search
+    function performRealTimeSearch() {
+      const formData = new FormData(document.getElementById('searchForm'));
+      formData.append('offset', 0);
+      formData.append('limit', 10);
+      
+      // Show loading indicator
+      document.getElementById('resultsContainer').innerHTML = `
+        <div class="text-center p-4">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <p class="mt-2">Searching...</p>
+        </div>
+      `;
+      
+      // Show results card
+      document.getElementById('resultsCard').style.display = 'block';
+      
+      // Reset pagination
+      currentOffset = 0;
+      
+      // Send AJAX request
+      fetch('/realtime_search', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Update results container
+        updateResultsTable(data.entries);
+        
+        // Update pagination
+        const loadMoreContainer = document.getElementById('loadMoreContainer');
+        if (data.has_more) {
+          loadMoreContainer.style.display = 'block';
+        } else {
+          loadMoreContainer.style.display = 'none';
+        }
+      })
+      .catch(error => {
+        console.error('Error performing real-time search:', error);
+        document.getElementById('resultsContainer').innerHTML = `
+          <div class="alert alert-danger m-3">
+            <i class="bi bi-exclamation-triangle me-2"></i> Error performing search
+          </div>
+        `;
+      });
+    }
+    
+    // Function to update results table
+    function updateResultsTable(entries) {
+      if (entries.length === 0) {
+        document.getElementById('resultsContainer').innerHTML = `
+          <div class="alert alert-info m-3">
+            <i class="bi bi-info-circle me-2"></i> No entries found
+          </div>
+        `;
+        return;
+      }
+      
+      // Create table HTML
+      let tableHtml = `
+        <div class="table-responsive p-3">
+          <table class="table table-hover table-bordered table-striped table-sortable table-fixed-width">
+            <thead class="table-dark">
+              <tr>
+                <th scope="col" width="5%" class="text-center"><input type="checkbox" id="selectAll" class="form-check-input"></th>
+                <th scope="col" width="20%" class="text-center">Title</th>
+                <th scope="col" width="20%" class="text-center">Hash ID</th>
+                <th scope="col" width="15%" class="text-center">Date</th>
+                <th scope="col" width="15%" class="text-center">Author</th>
+                <th scope="col" width="15%" class="text-center">Tags</th>
+                <th scope="col" width="10%" class="text-center">Conditions</th>
+              </tr>
+            </thead>
+            <tbody>
+      `;
+      
+      // Add rows for each entry
+      entries.forEach(entry => {
+        tableHtml += `
+          <tr>
+            <td class="text-center align-middle py-3">
+              <input class="form-check-input entry-checkbox" type="checkbox" id="Select&${entry.id}" name="Select&${entry.id}">
+            </td>
+            <td title="${entry.title}">
+              <a href="/entry/${entry.id}" class="text-decoration-none">
+                <span class="fw-bold">${entry.title}</span>
+              </a>
+            </td>
+            <td title="${entry.hash_id}">
+              <span class="text-monospace font-monospace small" id="hash_id_${entry.hash_id}">${entry.hash_id}</span>
+            </td>
+            <td>${entry.date}</td>
+            <td title="${entry.author}">${entry.author}</td>
+            <td title="${Array.isArray(entry.tags) ? entry.tags.join(', ') : ''}">
+              ${Array.isArray(entry.tags) ? entry.tags.map(tag => `<span class="badge bg-info text-dark me-1">${tag}</span>`).join('') : ''}
+            </td>
+            <td title="${Array.isArray(entry.conditions) ? entry.conditions.join(', ') : ''}">
+              ${Array.isArray(entry.conditions) ? entry.conditions.map(condition => `<span class="badge bg-warning text-dark me-1">${condition}</span>`).join('') : ''}
+            </td>
+          </tr>`;
+      });
+      
+      // Close table
+      tableHtml += `
+            </tbody>
+          </table>
+        </div>
+      `;
+      
+      // Update results container
+      document.getElementById('resultsContainer').innerHTML = tableHtml;
+      
+      // Add select all functionality
+      const selectAllCheckbox = document.getElementById('selectAll');
+      if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', function() {
+          const checkboxes = document.querySelectorAll('.entry-checkbox');
+          checkboxes.forEach(checkbox => {
+            checkbox.checked = selectAllCheckbox.checked;
+          });
+        });
+      }
+    }
+    
+    // Add event listeners to search fields
+    document.querySelectorAll('.realtime-search').forEach(input => {
+      input.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(performRealTimeSearch, searchDelay);
+      });
+      
+      if (input.type === 'checkbox') {
+        input.addEventListener('change', function() {
+          clearTimeout(searchTimeout);
+          searchTimeout = setTimeout(performRealTimeSearch, searchDelay);
+        });
+      }
+    });
+    
+    // Handle form reset
+    document.getElementById('resetFormBtn').addEventListener('click', function() {
+      setTimeout(function() {
+        document.getElementById('resultsCard').style.display = 'none';
+      }, 100);
+    });
+    
+    // Load more results functionality
+    document.getElementById('loadMoreResults').addEventListener('click', function() {
+      const button = this;
+      button.disabled = true;
+      button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...';
+      
+      // Increment offset for pagination
+      currentOffset += 10;
+      
+      // Get form data
+      const formData = new FormData(document.getElementById('searchForm'));
+      formData.append('offset', currentOffset);
+      formData.append('limit', 10);
+      
+      // Send AJAX request
+      fetch('/realtime_search', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Get table body
+        const tableBody = document.querySelector('.table tbody');
+        
+        // Add new rows
+        data.entries.forEach(entry => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td class="text-center align-middle py-3">
+              <input class="form-check-input entry-checkbox" type="checkbox" id="Select&${entry.id}" name="Select&${entry.id}">
+            </td>
+            <td title="${entry.title}">
+              <a href="/entry/${entry.id}" class="text-decoration-none">
+                <span class="fw-bold">${entry.title}</span>
+              </a>
+            </td>
+            <td title="${entry.hash_id}">
+              <span class="text-monospace font-monospace small" id="hash_id_${entry.hash_id}">${entry.hash_id}</span>
+            </td>
+            <td>${entry.date}</td>
+            <td title="${entry.author}">${entry.author}</td>
+            <td title="${Array.isArray(entry.tags) ? entry.tags.join(', ') : ''}">
+              ${Array.isArray(entry.tags) ? entry.tags.map(tag => `<span class="badge bg-info text-dark me-1">${tag}</span>`).join('') : ''}
+            </td>
+            <td title="${Array.isArray(entry.conditions) ? entry.conditions.join(', ') : ''}">
+              ${Array.isArray(entry.conditions) ? entry.conditions.map(condition => `<span class="badge bg-warning text-dark me-1">${condition}</span>`).join('') : ''}
+            </td>
+          </tr>`;
+          tableBody.appendChild(row);
+        });
+        
+        // Update button state
+        button.disabled = false;
+        button.innerHTML = '<i class="bi bi-arrow-down-circle me-1"></i> Show More Results';
+        
+        // Hide button if no more results
+        if (!data.has_more) {
+          document.getElementById('loadMoreContainer').style.display = 'none';
+        }
+      })
+      .catch(error => {
+        console.error('Error loading more results:', error);
+        button.disabled = false;
+        button.innerHTML = '<i class="bi bi-arrow-down-circle me-1"></i> Show More Results';
+      });
+    });
   });
 </script>
 {% endblock %}

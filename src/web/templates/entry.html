@@ -4,7 +4,7 @@
 <div class="container py-4">
   <!-- Header Section -->
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="mb-0">Entry: <span class="text-primary">{{entry[0]}}</span></h1>
+    <h2 class="mb-0"><span>Entry Details</span></h1>
     <span class="badge badge-pill badge-primary px-3 py-2">ID: {{entry[0]}}</span>
   </div>
 
@@ -168,10 +168,12 @@
                   </table>
                 </div>
                 {% else %}
-                <div class="alert alert-info">
+                <div class="alert alert-info" id="file-alert">
                   <i class="bi bi-info-circle me-2"></i>No files attached to this entry
                 </div>
                 {% endif %}
+                <!-- Container for newly selected files -->
+                <div id="selected-files" class="mt-2"></div>
               </div>
             </div>
             
@@ -279,4 +281,76 @@
     </div>
   </div>
 </div>
+
+<script>
+  // Function to update file label when files are selected
+  function updateFileLabel(input) {
+    const selectedFilesDiv = document.getElementById('selected-files');
+    const alertDiv = document.getElementById('file-alert');
+    
+    // Create elements if they don't exist
+    if (!selectedFilesDiv) {
+      const filesSection = input.closest('.card-body');
+      const newSelectedFilesDiv = document.createElement('div');
+      newSelectedFilesDiv.id = 'selected-files';
+      newSelectedFilesDiv.className = 'mt-2';
+      filesSection.appendChild(newSelectedFilesDiv);
+    }
+    
+    if (!alertDiv) {
+      const filesSection = input.closest('.card-body');
+      const newAlertDiv = document.createElement('div');
+      newAlertDiv.id = 'file-alert';
+      newAlertDiv.className = 'alert alert-info d-none';
+      newAlertDiv.innerHTML = '<i class="bi bi-info-circle me-2"></i>No files selected';
+      
+      // Insert at the beginning of the section
+      if (filesSection.firstChild) {
+        filesSection.insertBefore(newAlertDiv, filesSection.firstChild);
+      } else {
+        filesSection.appendChild(newAlertDiv);
+      }
+    }
+    
+    // Now get the elements (they should exist now)
+    const selectedFilesDivUpdated = document.getElementById('selected-files');
+    const alertDivUpdated = document.getElementById('file-alert');
+    
+    if (input.files && input.files.length > 0) {
+      if (alertDivUpdated) alertDivUpdated.classList.add('d-none');
+      if (selectedFilesDivUpdated) {
+        selectedFilesDivUpdated.innerHTML = '';
+        
+        for (let i = 0; i < input.files.length; i++) {
+          const file = input.files[i];
+          const fileItem = document.createElement('div');
+          fileItem.className = 'alert alert-secondary d-flex justify-content-between align-items-center mb-2';
+          
+          // Format file size
+          let fileSize;
+          if (file.size > 1024 * 1024) {
+            fileSize = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+          } else {
+            fileSize = (file.size / 1024).toFixed(2) + ' KB';
+          }
+          
+          fileItem.innerHTML = `
+            <div>
+              <i class="bi bi-file-earmark me-2"></i>${file.name}
+              <span class="text-muted ms-2">(${fileSize})</span>
+            </div>
+          `;
+          selectedFilesDivUpdated.appendChild(fileItem);
+        }
+        
+        console.log(`${input.files.length} files selected`);
+      }
+    } else {
+      if (alertDivUpdated) alertDivUpdated.classList.remove('d-none');
+      if (selectedFilesDivUpdated) selectedFilesDivUpdated.innerHTML = '';
+      console.log('No files selected');
+    }
+  }
+</script>
+
 {% endblock %}

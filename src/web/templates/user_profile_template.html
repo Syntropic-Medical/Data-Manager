@@ -12,14 +12,15 @@
             <div class="col-md-6">
                 <label for="password" class="form-label">Password*</label>
                 <input type="password" class="form-control" id="password" name="password" 
-                       value="{{user['password']}}" required>
+                       placeholder="Enter new password to change" autocomplete="new-password">
+                <small class="form-text text-muted">Leave blank to keep current password</small>
             </div>
 
             <!-- Repeat password field -->
             <div class="col-md-6">
                 <label for="repeat_password" class="form-label">Repeat Password*</label>
                 <input type="password" class="form-control" id="repeat_password" name="repeat_password" 
-                       value="{{user['password']}}" required>
+                       placeholder="Confirm new password" autocomplete="new-password">
             </div>
 
             <!-- Name field -->
@@ -50,8 +51,8 @@
             <div class="col-md-6">
                 <label for="admin" class="form-label">Admin*</label>
                 <select class="form-select" name="admin" id="admin" required>
-                    <option value="True" {% if user['admin'] %}selected{% endif %}>Yes</option>
-                    <option value="False" {% if not user['admin'] %}selected{% endif %}>No</option>
+                    <option value="1" {% if user['admin'] %}selected{% endif %}>Yes</option>
+                    <option value="0" {% if not user['admin'] %}selected{% endif %}>No</option>
                 </select>
             </div>
 
@@ -59,8 +60,8 @@
             <div class="col-md-6">
                 <label for="order_manager" class="form-label">Order Manager*</label>
                 <select class="form-select" name="order_manager" id="order_manager" required>
-                    <option value="True" {% if user['order_manager'] %}selected{% endif %}>Yes</option>
-                    <option value="False" {% if not user['order_manager'] %}selected{% endif %}>No</option>
+                    <option value="1" {% if user['order_manager'] %}selected{% endif %}>Yes</option>
+                    <option value="0" {% if not user['order_manager'] %}selected{% endif %}>No</option>
                 </select>
             </div>
             {% endif %}

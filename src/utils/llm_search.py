@@ -4,6 +4,7 @@ import datetime
 import os
 import requests
 import time
+from dotenv import load_dotenv
 
 class ExternalLLMSearch:
     """Search assistant that uses Claude API rather than loading models locally"""
@@ -14,6 +15,9 @@ class ExternalLLMSearch:
         Args:
             api_key: API key for Claude (can be set via environment variable)
         """
+        # Load environment variables if not already loaded
+        load_dotenv()
+        
         self.api_key = api_key or os.environ.get("CLAUDE_API_KEY")
         self.ready = self.api_key is not None
         if not self.ready:

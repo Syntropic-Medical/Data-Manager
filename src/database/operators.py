@@ -9,6 +9,7 @@ from dictianory import slef_made_codes
 import sqlite3
 from sqlite3 import Error
 import itertools
+import hashlib
 
 def create_connection(db_file):
     conn = None
@@ -58,9 +59,14 @@ def update_entry_in_db(conn, id, post_form, app_config, hash_id, Files):
         Tags_parsed = utils.parse_tags(Tags)
         insert_tag(conn, Tags_parsed)
 
+        # Handle file uploads
         if len(Files) > 0:
-            utils.upload_files(app_config, hash_id, Files)
+            upload_success, uploaded_files = utils.upload_files(app_config, hash_id, Files)
+            if not upload_success:
+                utils.error_log("Failed to upload files")
+                # Continue with the update even if file upload fails
 
+        # Handle file removals
         Files2remove = []
         for form_input in post_form:
             try:
@@ -72,6 +78,7 @@ def update_entry_in_db(conn, id, post_form, app_config, hash_id, Files):
         if len(Files2remove) > 0:
             utils.remove_files(app_config, hash_id, Files2remove)
 
+        # Process conditions
         conditions = []
         for form_input in post_form:
             if 'condition' == form_input.split('&')[0]:
@@ -83,15 +90,18 @@ def update_entry_in_db(conn, id, post_form, app_config, hash_id, Files):
                 conditions.append(list_tmp)
                 
         conditions = ','.join(conditions)
+        
+        # Update the database
         cursor = conn.cursor()
         rows = [(Tags, Notes, File_Path, date, conditions, entry_name, parent_entry, id)]
         cursor.executemany('update entries set tags=?, extra_txt=?, file_path=?, date=?, conditions=?, entry_name=?, entry_parent=? where id=?', rows)
         conn.commit()
         success_bool = 1
 
-    except Error as e:
+    except Exception as e:
         utils.error_log(e)
         success_bool = 0
+    
     return success_bool
 
 def delete_entry_from_db(conn, id):
@@ -213,13 +223,43 @@ def update_conditions_templates(conn, post_form, username):
     return True
 ### Conditions
 
+def hash_password(password):
+    """Hash a password with a random salt using SHA-256"""
+    salt = os.urandom(32)  # 32 bytes = 256 bits
+    hash_obj = hashlib.pbkdf2_hmac(
+        'sha256',  # Hash algorithm
+        password.encode('utf-8'),  # Convert password to bytes
+        salt,  # Salt
+        100000,  # Number of iterations
+    )
+    # Store salt and hash together
+    return salt.hex() + ':' + hash_obj.hex()
+
+def verify_password(stored_password, provided_password):
+    """Verify a password against its hash"""
+    if not stored_password or ':' not in stored_password:
+        # Handle legacy plain text passwords
+        return stored_password == provided_password
+        
+    salt_hex, hash_hex = stored_password.split(':')
+    salt = bytes.fromhex(salt_hex)
+    hash_obj = hashlib.pbkdf2_hmac(
+        'sha256',
+        provided_password.encode('utf-8'),
+        salt,
+        100000,
+    )
+    return hash_obj.hex() == hash_hex
+
 def add_user(conn, username, password, admin, order_manager, name, email):
     try:
         cursor = conn.cursor()
+        # Hash the password before storing
+        hashed_password = hash_password(password)
         cursor.execute("""
             INSERT INTO users (username, password, admin, order_manager, name, email)
             VALUES (?, ?, ?, ?, ?, ?)
-        """, (username, password, admin, order_manager, name, email))
+        """, (username, hashed_password, admin, order_manager, name, email))
         conn.commit()
         return True
     except Exception as e:
@@ -248,19 +288,15 @@ def update_user(conn, form_data, user_id):
             update_fields.append('email_enabled = ?')
             params.append(int(form_data['email_enabled']))
 
-        if 'password' in form_data:
+        # Only update password if a new one is provided
+        if 'password' in form_data and form_data['password'].strip():
             update_fields.append('password = ?')
-            params.append(form_data['password'])
+            hashed_password = hash_password(form_data['password'])
+            params.append(hashed_password)
     
         if 'admin' in form_data:    
             update_fields.append('admin = ?')
             params.append(form_data['admin'])
-
-        print(f"""
-                UPDATE users 
-                SET {', '.join(update_fields)}
-                WHERE id = ?
-            """, params)
 
         if update_fields:
             params.append(user_id)

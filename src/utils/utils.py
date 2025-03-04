@@ -201,12 +201,28 @@ def get_conditions_by_template_and_method(conn, app_config, username, templatena
     return conditions_html
 
 def upload_files(app_config, hash_id, Files):
-    folder_path = os.path.join(app_config['UPLOAD_FOLDER'], hash_id)
-    if not os.path.exists(folder_path):
-        os.mkdir(folder_path)
-    for file in Files:
-        if file.filename != '':
-            file.save(os.path.join(folder_path, file.filename))
+    try:
+        folder_path = os.path.join(app_config['UPLOAD_FOLDER'], hash_id)
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path, exist_ok=True)
+        
+        uploaded_files = []
+        for file in Files:
+            if file and file.filename and file.filename != '':
+                # Sanitize filename to prevent path traversal
+                safe_filename = os.path.basename(file.filename)
+                file_path = os.path.join(folder_path, safe_filename)
+                
+                try:
+                    file.save(file_path)
+                    uploaded_files.append(safe_filename)
+                except Exception as e:
+                    error_log(f"Error saving file {safe_filename}: {str(e)}")
+        
+        return True, uploaded_files
+    except Exception as e:
+        error_log(f"Error in upload_files: {str(e)}")
+        return False, []
 
 def remove_files(app_config, hash_id, file_names):
     for file_name in file_names:
@@ -256,9 +272,26 @@ def check_hash_id_existence(conn, hash_id):
     else:
         return True
 
-def load_creds(CREDS_FILE_PATH):
-    with open(CREDS_FILE_PATH) as f:
-        creds = json.load(f)
+def load_creds(CREDS_FILE_PATH=None):
+    """
+    Load credentials from environment variables.
+    The CREDS_FILE_PATH parameter is kept for backward compatibility but is no longer used.
+    """
+    import os
+    from dotenv import load_dotenv
+    
+    # Load environment variables from .env file
+    load_dotenv()
+    
+    # Create a dictionary with the same structure as the original creds.json
+    creds = {
+        "SECRET_KEY": os.environ.get("SECRET_KEY", ""),
+        "RECAPTCHA_PUBLIC_KEY": os.environ.get("RECAPTCHA_PUBLIC_KEY", ""),
+        "RECAPTCHA_PRIVATE_KEY": os.environ.get("RECAPTCHA_PRIVATE_KEY", ""),
+        "SENDER_EMAIL_ADDRESS": os.environ.get("SENDER_EMAIL_ADDRESS", ""),
+        "SENDER_EMAIL_PASSWORD": os.environ.get("SENDER_EMAIL_PASSWORD", "")
+    }
+    
     return creds
 
 def set_parent_entry(conn, entry_id, parent_hash_id):

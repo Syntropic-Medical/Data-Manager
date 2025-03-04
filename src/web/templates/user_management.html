@@ -162,14 +162,15 @@
                             <div class="col-md-6">
                                 <label for="password{{user.id}}" class="form-label">Password*</label>
                                 <input type="password" class="form-control" id="password{{user.id}}" name="password" 
-                                       value="{{user.password}}" required>
+                                       placeholder="Enter new password to change" autocomplete="new-password">
+                                <small class="form-text text-muted">Leave blank to keep current password</small>
                             </div>
 
                             <!-- Repeat password field -->
                             <div class="col-md-6">
                                 <label for="repeat_password{{user.id}}" class="form-label">Repeat Password*</label>
                                 <input type="password" class="form-control" id="repeat_password{{user.id}}" name="repeat_password" 
-                                       value="{{user.password}}" required>
+                                       placeholder="Confirm new password" autocomplete="new-password">
                             </div>
 
                             <!-- Name field -->

@@ -8,6 +8,10 @@ sys.path.append(os.path.join(parent_parent_path, 'src', 'web'))
 
 import flask
 import click
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 import operators
 import configs

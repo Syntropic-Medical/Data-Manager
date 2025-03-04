@@ -4,13 +4,13 @@
             <table class="table table-hover table-bordered table-striped table-sortable">
                 <thead class="table-dark">
                     <tr>
-                        <th scope="col" width="5%" class="text-center"><input type="checkbox" id="selectAll" class="form-check-input"></th>
-                        <th scope="col" width="20%" class="text-center">Title</th>
-                        <th scope="col" width="20%" class="text-center">Hash ID</th>
+                        <th scope="col" width="2.5%" class="text-center"><input type="checkbox" id="selectAll" class="form-check-input"></th>
+                        <th scope="col" width="35%" class="text-center">Title</th>
+                        <th scope="col" width="15%" class="text-center">Hash ID</th>
                         <th scope="col" width="15%" class="text-center">Date</th>
-                        <th scope="col" width="15%" class="text-center">Author</th>
-                        <th scope="col" width="15%" class="text-center">Tags</th>
-                        <th scope="col" width="10%" class="text-center">Conditions</th>
+                        <th scope="col" width="5%" class="text-center">Author</th>
+                        <th scope="col" width="13.75%" class="text-center">Tags</th>
+                        <th scope="col" width="13.75%" class="text-center">Conditions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -33,12 +33,12 @@
                             <td class="align-middle py-3">{{ entry.author }}</td>
                             <td class="align-middle py-3">
                                 {% for tag in entry.tags %}
-                                    <span class="badge bg-info text-dark me-1">{{ tag }}</span>
+                                    <span class="text-dark me-1">{{ tag }}</span>
                                 {% endfor %}
                             </td>
                             <td class="align-middle py-3">
                                 {% for condition in entry.conditions %}
-                                    <span class="badge bg-warning text-dark me-1">{{ condition }}</span>
+                                    <span class="text-dark me-1">{{ condition }}</span>
                                 {% endfor %}
                             </td>
                         </tr>

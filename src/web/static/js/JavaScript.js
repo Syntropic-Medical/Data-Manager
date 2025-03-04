@@ -283,14 +283,49 @@ $(document).ready(function(){
     const selectedFilesDiv = document.getElementById('selected-files');
     const alertDiv = document.getElementById('file-alert');
     
-    if (!selectedFilesDiv || !alertDiv) {
-      console.log("Required elements not found for file display");
+    // Create elements if they don't exist
+    if (!selectedFilesDiv) {
+      const filesSection = input.closest('.card-body');
+      if (filesSection) {
+        const newSelectedFilesDiv = document.createElement('div');
+        newSelectedFilesDiv.id = 'selected-files';
+        newSelectedFilesDiv.className = 'mt-2';
+        filesSection.appendChild(newSelectedFilesDiv);
+      } else {
+        console.log("Could not find parent card-body for file display");
+        return;
+      }
+    }
+    
+    if (!alertDiv) {
+      const filesSection = input.closest('.card-body');
+      if (filesSection) {
+        const newAlertDiv = document.createElement('div');
+        newAlertDiv.id = 'file-alert';
+        newAlertDiv.className = 'alert alert-info';
+        newAlertDiv.innerHTML = '<i class="bi bi-info-circle me-2"></i>No files selected';
+        
+        // Insert at the beginning of the section
+        if (filesSection.firstChild) {
+          filesSection.insertBefore(newAlertDiv, filesSection.firstChild);
+        } else {
+          filesSection.appendChild(newAlertDiv);
+        }
+      }
+    }
+    
+    // Now get the elements (they should exist now)
+    const selectedFilesDivUpdated = document.getElementById('selected-files');
+    const alertDivUpdated = document.getElementById('file-alert');
+    
+    if (!selectedFilesDivUpdated || !alertDivUpdated) {
+      console.log("Could not create required elements for file display");
       return;
     }
     
     if (input.files && input.files.length > 0) {
-      alertDiv.style.display = 'none';
-      selectedFilesDiv.innerHTML = '';
+      alertDivUpdated.style.display = 'none';
+      selectedFilesDivUpdated.innerHTML = '';
       
       for (let i = 0; i < input.files.length; i++) {
         const file = input.files[i];
@@ -311,13 +346,13 @@ $(document).ready(function(){
             <span class="text-muted ms-2">(${fileSize})</span>
           </div>
         `;
-        selectedFilesDiv.appendChild(fileItem);
+        selectedFilesDivUpdated.appendChild(fileItem);
       }
       
       console.log(`${input.files.length} files selected`);
     } else {
-      alertDiv.style.display = 'block';
-      selectedFilesDiv.innerHTML = '';
+      alertDivUpdated.style.display = 'block';
+      selectedFilesDivUpdated.innerHTML = '';
       console.log('No files selected');
     }
   };
@@ -490,4 +525,88 @@ $(document).on('click', '.notification-item', function(e) {
 $(document).ready(function() {
     loadNotifications();
     setInterval(loadNotifications, 30000); // Refresh every 30 seconds
+});
+
+// Keyword search autocomplete
+$(document).ready(function(){
+  if ($("#keyword_search").length) {
+    $("#keyword_search").on("input", function(e){
+      $("#keyword_search_datalist").css("display", "block");
+      $("#keyword_search_datalist").empty();
+      
+      $.ajax({
+          method: "post",
+          url: "/keyword_search",
+          data: {text: $("#keyword_search").val()},
+          success: function(res){
+              var data = "";
+              $.each(res, function(index, value){
+                  data += "<a class='search dropdown-item' onclick='put_text(`keyword_search_datalist`, `keyword_search`, `"+value[0]+"`)'>";
+                  data += value[0]+"</a>";
+              });
+              data += "</ul>";
+              $("#keyword_search_datalist").html(data);
+          }
+      });
+    });
+    
+    $(document).click(function(e) {
+      if (!$(e.target).is('#keyword_search') && $("#keyword_search_datalist").length) {
+        $("#keyword_search_datalist").css("display", "none");
+      }
+    });
+  }
+});
+
+// Load more search results
+$(document).ready(function() {
+  let currentOffset = 10; // Start after the first 10 entries
+  
+  $("#loadMoreResults").on("click", function() {
+    const button = $(this);
+    button.prop('disabled', true).html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...');
+    
+    $.ajax({
+      url: '/load_more_entries',
+      method: 'GET',
+      data: { offset: currentOffset },
+      success: function(response) {
+        if (response.entries && response.entries.length > 0) {
+          // Add the new entries to the table
+          const tableBody = $('table tbody');
+          
+          response.entries.forEach(function(entry) {
+            const row = `
+              <tr>
+                <td class="text-center"><input type="checkbox" name="selected_entries" value="${entry.id}" class="form-check-input entry-checkbox"></td>
+                <td><a href="/entry/${entry.id}">${entry.title || 'Untitled'}</a></td>
+                <td>${entry.hash_id || ''}</td>
+                <td>${entry.date || ''}</td>
+                <td>${entry.author || ''}</td>
+                <td>${entry.tags || ''}</td>
+                <td>${entry.conditions || ''}</td>
+              </tr>
+            `;
+            tableBody.append(row);
+          });
+          
+          // Update the offset for the next load
+          currentOffset = response.next_offset;
+          
+          // Hide the button if there are no more entries
+          if (!response.has_more) {
+            button.hide();
+          }
+        } else {
+          button.hide();
+        }
+        
+        button.prop('disabled', false).html('<i class="bi bi-arrow-down-circle me-1"></i> Show More Results');
+      },
+      error: function() {
+        button.prop('disabled', false).html('<i class="bi bi-arrow-down-circle me-1"></i> Show More Results');
+        alert('Error loading more results. Please try again.');
+      }
+    });
+  });
 });
