@@ -6,4 +6,6 @@ venv/
 .vscode
 src/database/uploaded_files/
 src/database/reports/
-src/database/family_tree/src/web/creds.json
+src/database/family_tree/
+src/web/creds.json
+.env

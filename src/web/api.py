@@ -1032,7 +1032,7 @@ class WebApp():
                             'receiver_email': email,
                             'sender_email': self.app.config['CREDS_FILE']['SENDER_EMAIL_ADDRESS'],
                             'password': self.app.config['CREDS_FILE']['SENDER_EMAIL_PASSWORD'],
-                            'subject': f'New order assigned: {order_data['order_name']}',
+                            'subject': f"New order assigned: {order_data['order_name']}",
                         }
                         mailing.send_new_order_mail(order_data, mail_args)
                         flask.flash('Order submitted successfully and email sent to the assignee')
