@@ -45,3 +45,69 @@ The default username and password are *admin* and *admin* (You can change this p
 ## Documentation
 
 Please take a look at [here](https://github.com/AminAlam/Data-Manager/wiki) for the full documentation.
+
+# LLM-Powered Search Assistant
+
+This application includes a natural language search assistant powered by Llama.
+
+## Model Setup Instructions
+
+1. Create a `models` directory in the root of your project:
+   ```
+   mkdir -p models
+   ```
+
+2. Download a GGUF format Llama model. You can get models from Hugging Face:
+   - For a smaller model: [Llama-2-7B-Chat-GGUF](https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF)
+   - For better quality: [Llama-2-13B-Chat-GGUF](https://huggingface.co/TheBloke/Llama-2-13B-Chat-GGUF)
+
+3. Download the appropriate quantized version based on your hardware capabilities:
+   - For limited RAM: Use the Q4_K_M or Q4_0 versions
+   - For more RAM: Use Q5_K_M or Q8_0 for better quality
+
+4. Place the downloaded model in the `models` directory and update the model path in `src/web/api.py`:
+   ```python
+   self.llm_search = LlamaSearch(
+       model_path="models/your-model-filename.gguf",
+       n_threads=num_threads
+   )
+   ```
+
+5. Restart your application and the search assistant will be ready to use!
+
+## Environment Variables
+
+The application now uses environment variables for configuration instead of the previous `creds.json` file. To set up your environment:
+
+1. Copy the `.env.example` file to `.env`:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Edit the `.env` file and fill in your configuration values:
+   ```
+   # Data Manager Environment Variables
+   
+   # Flask Secret Key
+   SECRET_KEY=your_secret_key_here
+   
+   # reCAPTCHA Keys
+   RECAPTCHA_PUBLIC_KEY=your_recaptcha_public_key
+   RECAPTCHA_PRIVATE_KEY=your_recaptcha_private_key
+   
+   # Email Configuration
+   SENDER_EMAIL_ADDRESS=your_email@example.com
+   SENDER_EMAIL_PASSWORD=your_email_password
+   
+   # Claude API Key
+   CLAUDE_API_KEY=your_claude_api_key
+   ```
+
+3. Make sure to install the required packages:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. The application will automatically load these environment variables at startup.
+
+**Note:** Never commit your `.env` file to version control. It's already added to `.gitignore`.
