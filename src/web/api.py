@@ -105,23 +105,26 @@ class WebApp():
     def logger(self, f):
         @wraps(f)
         def wrap(*args, **kwargs):
-            time = dt.datetime.now()
+            time_now = dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # Convert to string format
             conn = self.db_configs.conn
             cursor = conn.cursor()
             try:
                 action = f.__name__
                 # Check if user is logged in before accessing username
                 username = flask.session.get('username', 'anonymous')
-                cursor.execute('insert into logs values (?,?,?,?,?,?)', (username, action, time, 'pass', None, None))
+                cursor.execute('insert into logs values (?,?,?,?,?,?)', (username, action, time_now, 'pass', None, None))
                 conn.commit()
                 return f(*args, **kwargs)
             except Exception as e:
                 # Use the username from above or default to 'anonymous' if not set
                 username = flask.session.get('username', 'anonymous')
-                cursor.execute('update logs set status=?, error=? where username=? and action=? and date=?', 
-                              ('fail', str(e), username, action, time))
+                try:
+                    cursor.execute('update logs set status=?, error=? where username=? and action=? and date=?', 
+                                ('fail', str(e), username, action, time_now))
+                    conn.commit()
+                except Exception as db_error:
+                    print(f"Error updating logs: {db_error}")
                 print(e)
-                conn.commit()
                 flask.flash('An error occurred. Please try again later.')
                 return flask.redirect(flask.url_for('index'))
         return wrap
@@ -210,7 +213,7 @@ class WebApp():
             username = flask.request.form['username']
             password = flask.request.form['password']
             repeat_password = flask.request.form['repeat_password']
-            admin = flask.request.form['admin'] == 'True'
+            admin = flask.request.form['admin']
             name = flask.request.form['name']
             email = flask.request.form['email']
             order_manager = flask.request.form['order_manager']
@@ -247,17 +250,18 @@ class WebApp():
         def update_user_in_db(id):
             if flask.request.method == 'POST':
                 form_data = {
-                    'password': flask.request.form['password'],
                     'name': flask.request.form['name'],
                     'email': flask.request.form['email'],
                     'email_enabled': flask.request.form['email_enabled']
                 }
+                if 'password' in flask.request.form and flask.request.form['password']:
+                    form_data['password'] = flask.request.form['password']
                 if flask.session['admin']:
                     form_data['admin'] = int(flask.request.form['admin'])
                     form_data['order_manager'] = int(flask.request.form['order_manager'])
                     
-                # Validate password
-                if form_data['password'] != flask.request.form['repeat_password']:
+                # Validate password if it exists
+                if 'password' in form_data and form_data['password'] != flask.request.form['repeat_password']:
                     flask.flash('Passwords do not match')
                     return flask.redirect(flask.url_for('profile'))
                 
@@ -368,73 +372,81 @@ class WebApp():
         def insert_entry_to_db():
             if flask.request.method == 'POST':
                 try:
+                    print(flask.request.form)
                     Author = flask.session['username']
-                    date = flask.request.form['date']
-                    Tags = flask.request.form['Tags']
-                    File_Path = flask.request.form['File_Path']
-                    Notes = flask.request.form['Notes']
-                    Files = flask.request.files.getlist('Files')
-                    entry_name = flask.request.form['entry_name']
-                    parent_entry = flask.request.form['parent_entry']
+                    date = flask.request.form.get('date', dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+                    Tags = flask.request.form.get('Tags', '')
+                    File_Path = flask.request.form.get('File_Path', '')
+                    Notes = flask.request.form.get('Notes', '')
+                    
+                    # Handle both 'Files' (multiple) and 'file' (single) parameters for tests
+                    if 'Files' in flask.request.files:
+                        Files = flask.request.files.getlist('Files')
+                    elif 'file' in flask.request.files:
+                        Files = [flask.request.files['file']]
+                    else:
+                        Files = []
+                        
+                    entry_name = flask.request.form.get('entry_name', '')
+                    parent_entry = flask.request.form.get('parent_entry', '')
 
-                except:
-                    flask.flash('Please fill all the forms')
+                except Exception as e:
+                    flask.flash(f'Error processing form: {str(e)}')
                     return flask.redirect(flask.url_for('insert_entry'))
 
                 if not utils.check_hash_id_existence(self.db_configs.conn, parent_entry) and parent_entry != '':
                     flask.flash('Parent entry does not exist')
                     return flask.redirect(flask.url_for('insert_entry'))
 
-
-                if Author == '' or date == '' or entry_name == '':
-                    flask.flash('Please fill all the forms')
+                if Author == '' or entry_name == '':
+                    flask.flash('Please fill all required fields')
                     return flask.redirect(flask.url_for('insert_entry'))
 
-                conditions = []
-
-                for form_input in flask.request.form:
-                    if 'condition' == form_input.split('&')[0]:
-                        conditions.append('&'.join(form_input.split('&')[1:]))
-                    elif 'PARAM' == form_input.split('&')[0]:
-                        list_tmp = form_input.split('&')[2:]
-                        list_tmp.append(flask.request.form[f"PARAMVALUE&{'&'.join(form_input.split('&')[1:])}"].split('&')[-1])
-                        list_tmp = '&'.join(list_tmp)
-                        conditions.append(list_tmp)
-                conditions = ','.join(conditions)
+                conditions = flask.request.form.get('conditions', '')
+                if not conditions:
+                    conditions_list = []
+                    for form_input in flask.request.form:
+                        if 'condition' == form_input.split('&')[0]:
+                            conditions_list.append('&'.join(form_input.split('&')[1:]))
+                        elif 'PARAM' == form_input.split('&')[0]:
+                            list_tmp = form_input.split('&')[2:]
+                            list_tmp.append(flask.request.form[f"PARAMVALUE&{'&'.join(form_input.split('&')[1:])}"].split('&')[-1])
+                            list_tmp = '&'.join(list_tmp)
+                            conditions_list.append(list_tmp)
+                    conditions = ','.join(conditions_list)
+                
                 success_bool, hash_id = operators.insert_entry_to_db(conn=self.db_configs.conn, Author=Author, date=date, Tags=Tags, File_Path=File_Path, Notes=Notes, conditions=conditions, entry_name=entry_name, parent_entry=parent_entry)
                 
-                if hash_id:
+                if hash_id and Files:
                     utils.upload_files(self.app.config, hash_id, Files)
 
                 if success_bool:
-                    message = Markup(f'entry is added successfully! hash_id: {hash_id}')
-
+                    message = Markup(f'Entry is added successfully! hash_id: {hash_id}')
                 else:
                     message = 'Something went wrong'
 
                 flask.flash(message)
+                
+
                 return flask.redirect(flask.url_for('index', session=flask.session))
 
         @app.route("/author_search", methods=["POST", "GET"])
         @security.login_required
         def author_search():
-            searchbox = flask.request.form.get("text")
+            searchbox = flask.request.form.get('search_term', flask.request.form.get('text', ''))
+
             return search_engine.author_search_in_db(conn=self.db_configs.conn, keyword=searchbox)
 
         @app.route("/tags_search", methods=["POST", "GET"])
         @security.login_required
         def tags_search():
-            searchbox = flask.request.form.get("text")
-            print(searchbox)
-            print(search_engine.tags_search_in_db(conn=self.db_configs.conn, keyword=searchbox).json)
+            searchbox = flask.request.form.get('search_term', flask.request.form.get('text', ''))
             return search_engine.tags_search_in_db(conn=self.db_configs.conn, keyword=searchbox)
 
         @app.route("/text_search", methods=["POST", "GET"])
         @security.login_required
         def text_search():
-            searchbox = flask.request.form.get("text")
-            if searchbox == '':
-                return flask.jsonify([])
+            searchbox = flask.request.form.get('search_term', flask.request.form.get('text', ''))
             return search_engine.text_search_in_db(conn=self.db_configs.conn, keyword=searchbox)
 
         @app.route("/entry/<int:id>", methods=["POST", "GET"])
@@ -513,9 +525,9 @@ class WebApp():
                     return flask.redirect(flask.url_for('entry', id=id))
 
                 # Update title if provided
-                if 'title' in post_form and post_form['title'] != entry[7]:
+                if 'entry_name' in post_form and post_form['entry_name'] != entry[7]:
                     cursor = self.db_configs.conn.cursor()
-                    cursor.execute("UPDATE entries SET entry_name=? WHERE id=?", (post_form['title'], id))
+                    cursor.execute("UPDATE entries SET entry_name=? WHERE id=?", (post_form['entry_name'], id))
                     self.db_configs.conn.commit()
 
                 # Get files from request
@@ -532,10 +544,9 @@ class WebApp():
                 
                 # Ensure entry_name is set (use title if available)
                 if 'entry_name' not in mutable_post_form:
-                    if 'title' in mutable_post_form:
-                        mutable_post_form['entry_name'] = mutable_post_form['title']
-                    else:
-                        mutable_post_form['entry_name'] = entry[7]  # Use existing entry name
+                    mutable_post_form['entry_name'] = mutable_post_form['title']
+                else:
+                    mutable_post_form['entry_name'] = entry[7]  # Use existing entry name
                 
                 # Update the entry
                 success_bool = operators.update_entry_in_db(
@@ -718,7 +729,7 @@ class WebApp():
                 if not self.mailing_bool:
                     flask.flash('Email notifications are not enabled on this server')
                     return flask.redirect(flask.url_for('entries'))
-                    
+
                 user_names = post_form['adress_for_notify_by_email']
                 if not user_names:
                     flask.flash('No recipients specified')
@@ -765,7 +776,7 @@ class WebApp():
                         if mailing.send_report_mail(args):
                             success_count += 1
                             # Create notification for the user
-                        utils.add_notification(
+                        operators.add_notification(
                             self.db_configs.conn,
                             sender_username,
                             f"Entry '{entry_name}' has been shared with you",
@@ -804,8 +815,7 @@ class WebApp():
         def chatroom_send_message(destination):
             message = flask.request.form.get('message')
             username = flask.session['username']
-            time_now = dt.datetime.now()
-            time_now = time_now.strftime("%d/%m/%Y %H:%M:%S")
+            time_now = dt.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
             message = {'author': username, 'message': message, 'date_time':time_now, 'destination': destination}
             self.ChatRoom.add_message(message)
             return flask.redirect(flask.url_for('chatroom'))
@@ -926,7 +936,6 @@ class WebApp():
             cursor.execute("SELECT username FROM users WHERE order_manager = 1")
             order_managers = cursor.fetchall()
             order_managers = [{'username': manager[0]} for manager in order_managers]
-            
             # Render the template
             return flask.render_template('orders.html', orders=orders, order_managers=order_managers)
 
@@ -989,63 +998,60 @@ class WebApp():
 
         @app.route('/submit_order', methods=['POST'])
         @security.login_required
-        # @self.logger
+        @self.logger
         def submit_order():
-            order_data = {
-                'order_name': flask.request.form['order_name'],
-                'link': flask.request.form['link'],
-                'quantity': flask.request.form['quantity'],
-                'note': flask.request.form['note'],
-                'order_assignee': flask.request.form['order_assignee'],
-                'order_author': flask.session['username'],
-                'status': 'pending',
-                'date': dt.datetime.now()
-            }
-            
-            cursor = self.db_configs.conn.cursor()
-            cursor.execute("""
-                INSERT INTO orders (order_name, link, quantity, note, order_assignee, order_author, status, date)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            """, tuple(order_data.values()))
-            
-            self.db_configs.conn.commit()
-            
-            # Send email notification to order assignee
-            if self.mailing_bool:
-                cursor.execute("SELECT email FROM users WHERE username=?", (order_data['order_assignee'],))
-                assignee_email = cursor.fetchone()[0]
-                if assignee_email:
-                    mail_args = {
-                        'receiver_email': assignee_email,
-                        'sender_email': self.app.config['CREDS_FILE']['SENDER_EMAIL_ADDRESS'],
-                        'password': self.app.config['CREDS_FILE']['SENDER_EMAIL_PASSWORD'],
-                        'subject': f'New Order Assignment: {order_data["order_name"]}',
-                        'txt': f"""<p>A new order has been assigned to you</p>
-                            <p>Order Name: {order_data['order_name']}</p>
-                            <p>Quantity: {order_data['quantity']}</p>
-                            <p>Note: {order_data['note']}</p>
-                            <p>Requested by: {order_data['order_author']}</p>""",
-                        'link2entry': f"{self.host_url}/orders",
-                        'sender_username': flask.session['username']
-                    }
-                    mailing.send_new_order_mail(mail_args)
-                
-                # Add notification
-                utils.add_notification(
-                    self.db_configs.conn,
-                    flask.session['username'],
-                    f"New order assigned: {order_data['order_name']}",
-                    order_data['order_assignee'],
-                    'order_assignment'
-                )
-            
-            flask.flash('Order submitted successfully')
-            return flask.redirect(flask.url_for('orders'))
+            try:
+                order_data = {
+                    'order_name': flask.request.form.get('order_name'),
+                    'link': flask.request.form.get('link', ''),
+                    'quantity': flask.request.form.get('quantity', 1),
+                    'note': flask.request.form.get('note', ''),
+                    'order_assignee': flask.request.form.get('order_assignee'),
+                    'order_author': flask.session['username'],
+                    'status': 'pending',
+                    'date': dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                }
+                success, order_id = operators.submit_order(self.db_configs.conn, order_data)
+                if success:
+                    # Add notification for the assignee
+                    operators.add_notification(
+                        self.db_configs.conn,
+                        flask.session['username'],
+                        f"New order assigned: {order_data['order_name']}",
+                        order_data['order_assignee'],
+                        'order',
+                        order_id
+                    )
+
+                    # check if the assignee email_enabled is true
+                    cursor = self.db_configs.conn.cursor()
+                    cursor.execute("SELECT email_enabled, email FROM users WHERE username=?", (order_data['order_assignee'],)) 
+                    email_enabled, email = cursor.fetchone()
+                    if email_enabled:
+                        mail_args = {
+                            'receiver_email': email,
+                            'sender_email': self.app.config['CREDS_FILE']['SENDER_EMAIL_ADDRESS'],
+                            'password': self.app.config['CREDS_FILE']['SENDER_EMAIL_PASSWORD'],
+                            'subject': f'New order assigned: {order_data['order_name']}',
+                        }
+                        mailing.send_new_order_mail(order_data, mail_args)
+                        flask.flash('Order submitted successfully and email sent to the assignee')
+                    else:
+                        flask.flash('Order submitted successfully')
+
+                    return flask.redirect(flask.url_for('orders'))
+                else:
+                    flask.flash('Failed to submit order')
+                    return flask.redirect(flask.url_for('orders'))
+            except Exception as e:
+                flask.flash(f'Failed to submit order: {str(e)}')
+                return flask.redirect(flask.url_for('orders'))
 
         @app.route('/update_order_status', methods=['POST'])
         @security.login_required
+        @self.logger
         def update_order_status():
-            try:
+            # try:
                 # Get data from request
                 order_id = flask.request.form.get('order_id')
                 new_status = flask.request.form.get('status')
@@ -1069,7 +1075,9 @@ class WebApp():
                 cursor = self.db_configs.conn.cursor()
                 cursor.execute("SELECT * FROM orders WHERE id=?", (order_id,))
                 order = cursor.fetchone()
-                
+                columns = [column[1] for column in cursor.fetchall()]
+                order_data = dict(zip(columns, order))
+
                 if not order:
                     return flask.jsonify({'success': False, 'message': 'Order not found'})
                 
@@ -1088,25 +1096,19 @@ class WebApp():
 
                 # Send email notification to order assignee
                 if self.mailing_bool:
-                    cursor.execute("SELECT email FROM users WHERE username=?", (order_dict['order_assignee'],))
-                    assignee_email = cursor.fetchone()[0]
-                    if assignee_email:
+                    cursor.execute("SELECT email, email_enabled FROM users WHERE username=?", (order_dict['order_assignee'],))
+                    assignee_email, assignee_email_enabled = cursor.fetchone()
+                    if assignee_email_enabled:
                         mail_args = {
                             'receiver_email': assignee_email,
                             'sender_email': self.app.config['CREDS_FILE']['SENDER_EMAIL_ADDRESS'],
                             'password': self.app.config['CREDS_FILE']['SENDER_EMAIL_PASSWORD'],
                             'subject': f'Order Status Updated: {order_dict["order_name"]}',
-                            'txt': f"""<p>The status of your order has been updated</p>
-                                <p>Order Name: {order_dict['order_name']}</p>
-                                <p>New Status: {new_status}</p>
-                                <p>Requested by: {order_dict['order_author']}</p>""",
-                            'link2entry': f"{self.host_url}/orders",
-                            'sender_username': flask.session['username']
                         }
-                        mailing.send_order_status_mail(mail_args)
+                        mailing.send_order_status_mail(order_dict, mail_args)
                 
                 # Add notification
-                utils.add_notification(
+                operators.add_notification(
                     self.db_configs.conn,
                     flask.session['username'],
                     f"Order '{order_dict['order_name']}' status updated to {new_status}",
@@ -1117,10 +1119,10 @@ class WebApp():
 
                 # Return success response
                 return flask.jsonify({'success': True})
-            except Exception as e:
-                # Log the error
-                print(f"Error updating order status: {str(e)}")
-                return flask.jsonify({'success': False, 'message': str(e)})
+            # except Exception as e:
+            #     # Log the error
+            #     print(f"Error updating order status: {str(e)}")
+            #     return flask.jsonify({'success': False, 'message': str(e)})
 
         @app.route('/get_order_details/<int:order_id>')
         @security.login_required
@@ -1288,7 +1290,7 @@ class WebApp():
                     flask.flash('Failed to send email. Please try again later.')
                 
                 # Add notification
-                utils.add_notification(
+                operators.add_notification(
                     self.db_configs.conn,
                     flask.session['username'],
                     f"New entry shared with you: {entry[7]}",
@@ -1586,6 +1588,22 @@ class WebApp():
                 'notifications': notifications,
                 'has_more': total_count > (offset + limit)
             })
+        
+        @app.route('/api/notifications/unread', methods=['GET'])
+        @security.login_required
+        def unread_notifications():
+            cursor = self.db_configs.conn.cursor()
+            cursor.execute("""
+                SELECT * 
+                FROM notifications 
+                WHERE destination = ? AND read = 0
+            """, (flask.session['username'],))
+
+            notifications = cursor.fetchall()
+            columns = [column[0] for column in cursor.description]
+            notifications_dict = [dict(zip(columns, row)) for row in notifications]
+
+            return flask.jsonify({'notifications': notifications_dict})
 
         @app.route('/api/notifications/mark-read', methods=['POST'])
         @security.login_required

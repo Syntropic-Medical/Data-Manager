@@ -35,7 +35,7 @@ def get_expected_schemas() -> dict:
             ('destination', 'text', 1, None, 0),
             ('read', 'integer', 0, '0', 0),
             ('type', 'text', 1, None, 0),
-            ('reference_id', 'integer', 0, None, 0)
+            ('reference_id', 'integer', 0, None, 0),
         ]
         # Add other tables as needed
     }

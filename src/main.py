@@ -20,8 +20,8 @@ import api
 
 # database configuration
 db_configs = configs.database_configs()
-if not utils.check_existence_table(db_configs):
-    utils.init_db(db_configs)
+# if not utils.check_existence_table(db_configs):
+utils.init_db(db_configs)
 
 # apply updates to the database (if exists)
 utils.apply_updates2db(db_configs)

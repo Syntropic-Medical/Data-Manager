@@ -37,7 +37,7 @@
               <label for="order_assignee" class="form-label">Assign To*</label>
               <select class="form-control" id="order_assignee" name="order_assignee" required>
                 {% for manager in order_managers %}
-                  <option value="{{ manager.username }}">{{ manager.username }}</option>
+                  <option value="{{ manager['username'] }}" {% if loop.first %}selected{% endif %}>{{ manager['username'] }}</option>
                 {% endfor %}
               </select>
             </div>
@@ -152,10 +152,10 @@
                 {% endif %}
               </td>
               <td class="text-center align-middle py-3">
-                <button class="btn btn-sm btn-info" onclick="showOrderDetails({{ order.id }})">Details</button>
+                <button class="btn btn-sm btn-info" onclick="window.showOrderDetails({{ order.id }})">Details</button>
                 {% if session.username == order.order_author %}
-                  <button class="btn btn-sm btn-warning" onclick="editOrder({{ order.id }})">Edit</button>
-                  <button class="btn btn-sm btn-danger" onclick="deleteOrder({{ order.id }})">Delete</button>
+                  <button class="btn btn-sm btn-warning" onclick="window.editOrder({{ order.id }})">Edit</button>
+                  <button class="btn btn-sm btn-danger" onclick="window.deleteOrder({{ order.id }})">Delete</button>
                 {% endif %}
               </td>
             </tr>
@@ -249,73 +249,17 @@
 </div>
 
 <!-- Include the orders.js script -->
-<script src="{{ url_for('static', filename='js/orders.js') }}"></script>
-
-<!-- Initialize the save and delete buttons -->
+{% block scripts %}
+{{ super() }}
 <script>
-  $(document).ready(function() {
-    // Save order changes
-    $('#saveOrderChanges').on('click', function() {
-      const orderId = $('#edit_order_id').val();
-      const orderName = $('#edit_order_name').val();
-      const link = $('#edit_link').val();
-      const quantity = $('#edit_quantity').val();
-      const note = $('#edit_note').val();
-      
-      $.post('/update_order', {
-        order_id: orderId,
-        order_name: orderName,
-        link: link,
-        quantity: quantity,
-        note: note
-      })
-      .done(function(response) {
-        if (response.success) {
-          $('#editOrderModal').modal('hide');
-          showAlert('Order updated successfully', 'success');
-          // Reload the page to show updated data
-          setTimeout(function() {
-            location.reload();
-          }, 1000);
-        } else {
-          showAlert('Failed to update order: ' + (response.error || 'Unknown error'), 'danger');
-        }
-      })
-      .fail(function() {
-        showAlert('Failed to update order', 'danger');
-      });
-    });
-    
-    // Confirm delete order
-    $('#confirmDeleteOrder').on('click', function() {
-      const orderId = $('#delete_order_id').val();
-      
-      $.post('/delete_order', {
-        order_id: orderId
-      })
-      .done(function(response) {
-        if (response.success) {
-          $('#deleteOrderModal').modal('hide');
-          showAlert('Order deleted successfully', 'success');
-          // Reload the page to show updated data
-          setTimeout(function() {
-            location.reload();
-          }, 1000);
-        } else {
-          showAlert('Failed to delete order: ' + (response.error || 'Unknown error'), 'danger');
-        }
-      })
-      .fail(function() {
-        showAlert('Failed to delete order', 'danger');
-      });
-    });
-  });
+  // Pass Flask session data to JavaScript
+  window.sessionData = {
+    "username": "{{ session.username }}",
+    "admin": {{ 'true' if session.admin else 'false' }},
+    "orderManager": {{ 'true' if session.order_manager else 'false' }}
+  };
 </script>
+<script src="{{ url_for('static_dir', filename='static/js/orders.js') }}"></script>
+{% endblock %}
 
-<script>
-    // Pass Flask session data to JavaScript
-    window.currentUsername = "{{ session.username }}";
-    window.isAdmin = {{ 'true' if session.admin else 'false' }};
-    window.isOrderManager = {{ 'true' if session.order_manager else 'false' }};
-</script>
 {% endblock %}

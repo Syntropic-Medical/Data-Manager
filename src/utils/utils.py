@@ -332,14 +332,46 @@ def entry_report_maker(conn, entry_id):
     entry[6] = parse_conditions(entry[6])
     for i in range(len(entry[6])):
         entry[6][i] = entry[6][i].replace('&', '->')
-    report = f'Hash ID: {entry[0]}'
-    report = report + f'\nParent Hash ID: {entry[8]}'
-    report = report + f'\nName: {entry[7]}'
-    report = report + f'\nAuthor: {entry[5]}'
-    report = report + f'\nDate: {entry[4]}'
-    report = report + f'\nFile Path: {entry[3]}'
-    report = report + f'\nTags: {entry[1]}'
-    report = report + f'\nConditions: {entry[6]}'
+    report = f"""
+    <table>
+        <tr>
+            <th>Field</th>
+            <th>Value</th>
+        </tr>
+        <tr>
+            <td>Hash ID</td>
+            <td>{entry[0]}</td>
+        </tr>
+        <tr>
+            <td>Parent Hash ID</td>
+            <td>{entry[8]}</td>
+        </tr>
+        <tr>
+            <td>Name</td>
+            <td>{entry[7]}</td>
+        </tr>
+        <tr>
+            <td>Author</td>
+            <td>{entry[5]}</td>
+        </tr>
+        <tr>
+            <td>Date</td>
+            <td>{entry[4]}</td>
+        </tr>
+        <tr>
+            <td>File Path</td>
+            <td>{entry[3]}</td>
+        </tr>
+        <tr>
+            <td>Tags</td>
+            <td>{entry[1]}</td>
+        </tr>
+        <tr>
+            <td>Conditions</td>
+            <td>{entry[6]}</td>
+        </tr>
+    </table>
+    """
     return report
 
 def check_hash_id_existence(conn, hash_id):
@@ -553,20 +585,3 @@ def is_valid_email(email: str) -> bool:
     email_pattern = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
     return bool(email_pattern.match(email))
 
-def add_notification(conn, author, message, destination, notification_type, reference_id=None):
-    """Add a notification to the notifications table"""
-    cursor = conn.cursor()
-    cursor.execute("""
-        INSERT INTO notifications 
-        (author, message, date, destination, type, reference_id, read) 
-        VALUES (?, ?, ?, ?, ?, ?, 0)
-    """, (author, message, dt.datetime.now(), destination, notification_type, reference_id))
-    conn.commit()
-
-def get_column_names(conn, table_name):
-    """Get column names for a specified table."""
-    cursor = conn.cursor()
-    cursor.execute(f"PRAGMA table_info({table_name})")
-    columns = cursor.fetchall()
-    column_names = [column[1] for column in columns]  # Column name is the second field
-    return column_names

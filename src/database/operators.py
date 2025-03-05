@@ -574,7 +574,7 @@ def submit_order(conn, order_data):
             (order_name, link, quantity, note, order_assignee, order_author, status, date)
         )
         conn.commit()
-        
+
         # Get the ID of the inserted order
         order_id = cursor.lastrowid
         return True, order_id
@@ -640,35 +640,43 @@ def delete_order(conn, order_id):
         return False
 
 ### Notification Operations ###
-def add_notification(conn, sender, message, recipient, notification_type, reference_id=None):
-    try:
+def add_notification(conn, author, message, destination, notification_type, reference_id=None):
+    # try:
         cursor = conn.cursor()
-        date = dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        now = dt.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         cursor.execute(
-            'INSERT INTO notifications (sender, message, recipient, date, read, type, reference_id) VALUES (?, ?, ?, ?, ?, ?, ?)',
-            (sender, message, recipient, date, 0, notification_type, reference_id)
+            'INSERT INTO notifications (author, message, date, destination, read, type, reference_id) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            (author, message, now, destination, 0, notification_type, reference_id)
         )
         conn.commit()
         return True
-    except Error as e:
-        utils.error_log(e)
-        return False
+    # except Error as e:
+    #     utils.error_log(e)
+    #     return False
 
 def get_notifications(conn, username, limit=10, offset=0):
     try:
         cursor = conn.cursor()
         cursor.execute(
-            "SELECT * FROM notifications WHERE recipient=? ORDER BY date DESC LIMIT ? OFFSET ?",
+            '''SELECT id, author, message, date, destination, read, type, reference_id 
+               FROM notifications 
+               WHERE destination = ? 
+               ORDER BY date DESC LIMIT ? OFFSET ?''',
             (username, limit, offset)
         )
-        notifications = cursor.fetchall()
-        
-        # Get column names
-        cursor.execute("PRAGMA table_info(notifications)")
-        columns = [column[1] for column in cursor.fetchall()]
-        
-        # Convert to list of dictionaries
-        return [dict(zip(columns, notification)) for notification in notifications]
+        notifications = []
+        for row in cursor.fetchall():
+            notifications.append({
+                'id': row[0],
+                'author': row[1],
+                'message': row[2],
+                'date': row[3],
+                'recipient': row[4],
+                'read': row[5],
+                'type': row[6],
+                'reference_id': row[7]
+            })
+        return notifications
     except Error as e:
         utils.error_log(e)
         return []
@@ -686,7 +694,7 @@ def mark_notification_read(conn, notification_id):
 def get_unread_notification_count(conn, username):
     try:
         cursor = conn.cursor()
-        cursor.execute("SELECT COUNT(*) FROM notifications WHERE recipient=? AND read=0", (username,))
+        cursor.execute("SELECT COUNT(*) FROM notifications WHERE destination=? AND read=0", (username,))
         count = cursor.fetchone()[0]
         return count
     except Error as e:
@@ -774,3 +782,11 @@ def get_email_address_by_user_name(conn, username):
     except Error as e:
         utils.error_log(e)
         return None
+
+def get_column_names(conn, table_name):
+    """Get column names for a specified table."""
+    cursor = conn.cursor()
+    cursor.execute(f"PRAGMA table_info({table_name})")
+    columns = cursor.fetchall()
+    column_names = [column[1] for column in columns]  # Column name is the second field
+    return column_names

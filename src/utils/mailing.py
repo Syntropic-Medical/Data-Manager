@@ -93,39 +93,61 @@ def send_password_reset_mail(info):
     """
     return send_email(receiver_email, sender_email, password, subject, html)
 
-def send_new_order_mail(info):
-    receiver_email = info['receiver_email']
-    sender_email = info['sender_email']
-    password = info['password']
-    subject = info['subject']
-    txt = info['txt']
-    link2entry = info['link2entry']
-    sender_username = info['sender_username']
-
+def send_new_order_mail(order_data, mail_args):
+    receiver_email = mail_args['receiver_email']
+    sender_email = mail_args['sender_email']
+    password = mail_args['password']
+    subject = mail_args['subject']
+    order_name = order_data['order_name']
+    link = order_data['link']
+    quantity = order_data['quantity']
+    note = order_data['note']
+    assignee = order_data['order_assignee']
+    author = order_data['order_author']
+    # nice tabek in html
     html = f"""
     <div>
-    <p> {txt} </p>
-    <br>
-    <a href="https://{link2entry}">View in Orders Dashboard</a>
-    <br>
-    <br>
+    <table>
+    <tr>
+    <td>Order Name</td>
+    <td>{order_name}</td>
+    </tr>
+    </table>
+    <p>Link: <a href="https://{link}">{link}</a></p>
+    <p>Quantity: {quantity}</p>
+    <p>Note: {note}</p>
+    <p>Assignee: {assignee}</p>
+    <p>Author: {author}</p>
     </div>
     """
     send_email(receiver_email, sender_email, password, subject, html)
 
-def send_order_status_mail(info):
-    receiver_email = info['receiver_email']
-    sender_email = info['sender_email']
-    password = info['password']
-    subject = info['subject']
-    txt = info['txt']
-    link2entry = info['link2entry']
-    sender_username = info['sender_username']
+def send_order_status_mail(order_data, mail_args):
+    sender_email = mail_args['sender_email']
+    receiver_email = mail_args['receiver_email']
+    password = mail_args['password']
+    subject = mail_args['subject']
+    order_name = order_data['order_name']
+    status = order_data['status']
+    author = order_data['order_author']
 
+    # convert txt to html table
     html = f"""
     <div>
-    <p>{txt}</p>
-    <br>
-    <a href="https://{link2entry}">View in Orders Dashboard</a>
+    <table>
+    <tr>
+    <td>Order Name</td>
+    <td>{order_name}</td>
+    </tr>
+    <tr>
+    <td>New Status</td>
+    <td>{status}</td>
+    </tr>
+    <tr>
+    <td>Requested by</td>
+    <td>{author}</td>
+    </tr>
+    </table>
+    </div>
     """
-    send_email(receiver_email, sender_email, password, subject, html)
+    send_email(receiver_email, sender_email, password, subject, html)   
