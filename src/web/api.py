@@ -45,7 +45,7 @@ def add_admin(db_configs, app_configs):
     cursor.execute('select * from users where username=?', ('admin',))
     users = cursor.fetchall()
     if len(users)==0:
-        cursor.execute('insert into users values (?,?,?,?,?,?,?)', ('admin', 'admin', 1, 1, None, None, None))
+        cursor.execute('insert into users values (?,?,?,?,?,?,?,?)', ('admin', 'admin', 1, 1, None, None, 1, None))
         conn.commit()
         utils.init_user(app_configs, db_configs, 'admin')
 
@@ -83,7 +83,8 @@ class WebApp():
         add_admin(self.db_configs, self.app.config)
         
         # Initialize LLM search with API key from environment variables
-        self.llm_search = ExternalLLMSearch()
+        testing_mode = self.app.config.get('TESTING', False)
+        self.llm_search = ExternalLLMSearch(testing_mode=testing_mode)
         if self.llm_search.ready:
             print("Claude API service initialized successfully.")
         else:
@@ -173,6 +174,7 @@ class WebApp():
             # Convert entries from tuples to dictionaries with named keys
             entries_dict_list = []
             for entry in entries_list:
+                print(entry)
                 entries_dict_list.append({
                     'hash_id': entry[0],
                     'tags': entry[1],
@@ -180,7 +182,7 @@ class WebApp():
                     'date': entry[4],
                     'conditions': entry[6],
                     'title': entry[7],
-                    'id': entry[-1]
+                    'id': entry[9]
                 })
             
             entries_html = flask.render_template('entries_list.html', entries_list=entries_dict_list)
@@ -271,25 +273,19 @@ class WebApp():
         @security.admin_required
         @self.logger
         def delete_user(id):
-            conn = self.db_configs.conn
-            cursor = conn.cursor()
-            cursor.execute('select * from users where id=?', (id,))
-            users = cursor.fetchall()
-
-            if len(users)==0:
-                flask.flash('Username does not exist')
-                return flask.redirect(flask.url_for('user_management'))
-
-            else:
-                cursor.execute('delete from users where id=?', (id,))
-                conn.commit()
+            success = operators.delete_user(self.db_configs.conn, id)
+            
+            if success:
                 flask.flash('User deleted successfully')
-                return flask.redirect(flask.url_for('user_management'))
+            else:
+                flask.flash('Error deleting user')
+                
+            return flask.redirect(flask.url_for('user_management'))
         
         @app.route('/user_management', methods=['GET', 'POST'])
         @security.admin_required
         def user_management():
-            users = utils.get_users(self.db_configs.conn)
+            users = operators.get_users(self.db_configs.conn)
 
             users_html = [flask.render_template('user_profile_template.html', user=user) for user in users]
             users_html = [Markup(user_html) for user_html in users_html]
@@ -429,6 +425,8 @@ class WebApp():
         @security.login_required
         def tags_search():
             searchbox = flask.request.form.get("text")
+            print(searchbox)
+            print(search_engine.tags_search_in_db(conn=self.db_configs.conn, keyword=searchbox).json)
             return search_engine.tags_search_in_db(conn=self.db_configs.conn, keyword=searchbox)
 
         @app.route("/text_search", methods=["POST", "GET"])
@@ -442,18 +440,20 @@ class WebApp():
         @app.route("/entry/<int:id>", methods=["POST", "GET"])
         @security.login_required
         def entry(id):
-            cursor = self.db_configs.conn.cursor()
-            cursor.execute("SELECT * FROM entries WHERE id=?", (id,))
-            entry = cursor.fetchone()
-            target_conditions = entry[6]
-            entry = list(entry)
-            entry[6] = utils.parse_conditions(entry[6])
-            for i in range(len(entry[6])):
-                if len(entry[6][i].split('&')) ==3:
-                    entry[6][i] = entry[6][i].split('&')[-1]
+            entry = operators.get_entry_by_id(self.db_configs.conn, id)
+            
+            if not entry:
+                flask.flash('Entry not found')
+                return flask.redirect(flask.url_for('index'))
+            print(entry)
+            target_conditions = entry['conditions']
+            entry['conditions'] = utils.parse_conditions(entry['conditions'])
+            for i in range(len(entry['conditions'])):
+                if len(entry['conditions'][i].split('&')) ==3:
+                    entry['conditions'][i] = entry['conditions'][i].split('&')[-1]
                 else:
-                    entry[6][i] = '->'.join(entry[6][i].split('&')[-2:])
-            hash_id = entry[0]
+                    entry['conditions'][i] = '->'.join(entry['conditions'][i].split('&')[-2:])
+            hash_id = entry['id_hash']
             dirName = os.path.join(app.config['UPLOAD_FOLDER'], hash_id)
             List = os.listdir(dirName)
 
@@ -466,8 +466,6 @@ class WebApp():
 
             Files = List
             conditions = utils.read_json_file(self.app.config['CONDITIONS_JSON'])
-            entry = tuple(entry)
-            print(entry)
             conditions = utils.modify_conditions_json(conditions, target_conditions)
             conditions_html = flask.render_template('conditions.html', conditions=conditions)
             conditions_html = Markup(conditions_html)
@@ -476,7 +474,10 @@ class WebApp():
         @app.route("/entry_by_hash_id/<string:hash_id>", methods=["POST", "GET"])
         @security.login_required
         def entry_by_hash_id(hash_id):
-            id = utils.get_id_by_hash_id(self.db_configs.conn, hash_id)
+            id = operators.get_id_by_hash_id(self.db_configs.conn, hash_id)
+            if id is None:
+                flask.flash('Entry not found')
+                return flask.redirect(flask.url_for('index'))
             return flask.redirect(flask.url_for('entry', id=id))
 
         @app.route("/entry/<int:id>/update_entry", methods=["POST", "GET"])
@@ -499,24 +500,21 @@ class WebApp():
                     return flask.redirect(flask.url_for('entry', id=id))
 
                 # get hash_id from id
-                cursor = self.db_configs.conn.cursor()
-                cursor.execute("SELECT id_hash FROM entries WHERE id=?", (id,))
-                hash_id_result = cursor.fetchone()
+                hash_id = operators.get_hash_id_by_entry_id(self.db_configs.conn, id)
                 
-                if not hash_id_result:
+                if not hash_id:
                     flask.flash('Entry hash ID not found')
                     return flask.redirect(flask.url_for('index'))
-                    
-                hash_id = hash_id_result[0]
 
                 # Check parent entry if provided
                 parent_entry = post_form.get('parent_entry', '')
-                if parent_entry and not utils.check_hash_id_existence(self.db_configs.conn, parent_entry):
+                if parent_entry and not operators.check_hash_id_existence(self.db_configs.conn, parent_entry):
                     flask.flash('Parent entry does not exist')
                     return flask.redirect(flask.url_for('entry', id=id))
 
                 # Update title if provided
                 if 'title' in post_form and post_form['title'] != entry[7]:
+                    cursor = self.db_configs.conn.cursor()
                     cursor.execute("UPDATE entries SET entry_name=? WHERE id=?", (post_form['title'], id))
                     self.db_configs.conn.commit()
 
@@ -625,16 +623,12 @@ class WebApp():
         @security.login_required
         def profile():
             username = flask.session['username']
-            cursor = self.db_configs.conn.cursor()
-            print(username)
-            cursor.execute("SELECT * FROM users WHERE username=?", (username,))
-            user = cursor.fetchone()
-            # get columns names from the table
-            cursor.execute("PRAGMA table_info(users)")
-            columns = cursor.fetchall()
-            columns = [column[1] for column in columns]
-            # coonvert user to dict with columns as keys
-            user = dict(zip(columns, user))
+            user = operators.get_user_by_username(self.db_configs.conn, username)
+            
+            if not user:
+                flask.flash('User not found')
+                return flask.redirect(flask.url_for('index'))
+                
             user_html = flask.render_template('user_profile_template.html', user=user)
             user_html = Markup(user_html)
             return flask.render_template('profile.html', user_html=user_html)
@@ -825,12 +819,7 @@ class WebApp():
         @app.route('/logs', methods=["GET", "POST"])
         @security.admin_required
         def logs():
-            cusor = self.db_configs.conn.cursor()
-            # get all logs since last 7 days
-            cusor.execute("SELECT * FROM logs WHERE date > date('now', '-7 days')")
-            logs = cusor.fetchall()
-            columns = [column[0] for column in cusor.description]
-            logs = [dict(zip(columns, row)) for row in logs]
+            logs = operators.get_recent_logs(self.db_configs.conn, 7)
             return flask.render_template('logs.html', logs=logs)
 
         @app.route('/backup', methods=["GET", "POST"])
@@ -1089,7 +1078,7 @@ class WebApp():
                 order_dict = dict(zip(columns, order))
                 
                 # Check if user is authorized to update this order
-                if not (flask.session['admin'] or flask.session['username'] == order_dict['order_assignee']):
+                if not (flask.session['admin'] or flask.session['username'] == order_dict['order_author']):
                     return flask.jsonify({'success': False, 'message': 'Unauthorized'})
                 
                 # Update the order in the database
@@ -1609,11 +1598,6 @@ class WebApp():
             if not notification_id:
                 return flask.jsonify({'error': 'Missing notification id'}), 400
             
-            try:
-                notification_id = int(notification_id)
-            except (TypeError, ValueError):
-                return flask.jsonify({'error': 'Invalid notification id format'}), 400
-            
             cursor = self.db_configs.conn.cursor()
             cursor.execute("""
                 UPDATE notifications 
@@ -1631,6 +1615,7 @@ class WebApp():
         @security.login_required
         def keyword_search():
             searchbox = flask.request.form.get("text")
+
             return search_engine.keyword_search_in_db(conn=self.db_configs.conn, keyword=searchbox)
             
         @app.route("/realtime_search", methods=["POST"])
@@ -1667,7 +1652,7 @@ class WebApp():
                     'date': entry[4],
                     'conditions': entry[6],
                     'title': entry[7],
-                    'id': entry[-1]
+                    'id': entry[9]
                 })
             
             # Return the results as JSON
@@ -1799,5 +1784,8 @@ class WebApp():
             
             return flask.render_template('reset_password.html', token=token)
 
-        t = Thread(target=waitress.serve, args=([self.app]), kwargs={'host':self.ip, 'port':self.port, 'threads':self.num_threads})
-        t.start()        
+        # Check if we're in testing mode
+        if not self.app.config.get('TESTING', False):
+            # Only start the waitress server if not in testing mode
+            t = Thread(target=waitress.serve, args=([self.app]), kwargs={'host':self.ip, 'port':self.port, 'threads':self.num_threads})
+            t.start()        

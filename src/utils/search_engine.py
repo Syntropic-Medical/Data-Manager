@@ -4,14 +4,20 @@ import utils
 
 def author_search_in_db(conn, keyword):
     if keyword != '' and keyword != ' ':
+        keyword = keyword.split(',')
+        keyword = keyword[-1]
         try:
             cursor = conn.cursor()
             cursor.execute("select *  FROM authors WHERE author LIKE ?", (f"%{keyword}%",))
             result = cursor.fetchall()
+            # Convert SQLite Row objects to dictionaries
+            columns = [column[0] for column in cursor.description]
+            result = [dict(zip(columns, row)) for row in result] if result else []
+            print(result)
         except:
-            result = None
+            result = []
     else:
-        result = None
+        result = []
     return jsonify(result)
 
 def tags_search_in_db(conn, keyword):
@@ -22,10 +28,13 @@ def tags_search_in_db(conn, keyword):
             cursor = conn.cursor()
             cursor.execute("select *  FROM tags WHERE tag LIKE ?", (f"%{keyword}%",))
             result = cursor.fetchall()
+            # Convert SQLite Row objects to dictionaries
+            columns = [column[0] for column in cursor.description]
+            result = [dict(zip(columns, row)) for row in result] if result else []
         except:
-            result = None
+            result = []
     else:
-        result = None
+        result = []
     return jsonify(result)
 
 def text_search_in_db(conn, keyword):
@@ -35,22 +44,32 @@ def text_search_in_db(conn, keyword):
             cursor = conn.cursor()
             cursor.execute("select *  FROM entries WHERE extra_txt LIKE ?", (f"%{keyword}%",))
             result = cursor.fetchall()
+            # Convert SQLite Row objects to dictionaries
+            columns = [column[0] for column in cursor.description]
+            result = [dict(zip(columns, row)) for row in result] if result else []
         except:
-            result = None
+            result = []
     else:
-        result = None
-    for i,r in enumerate(result):
-        r = list(r)
-        index = r[2].find(keyword)
-        r[2] = r[2][index-20:index+20]
-        r = [r[2], r[-1]]
-        result[i] = tuple(r)
-    return jsonify(result)
+        result = []
+    
+    processed_result = []
+    for r in result:
+        if 'extra_txt' in r and r['extra_txt'] and keyword in r['extra_txt']:
+            index = r['extra_txt'].find(keyword)
+            start_index = max(0, index - 20)
+            end_index = min(len(r['extra_txt']), index + 20)
+            excerpt = r['extra_txt'][start_index:end_index]
+            entry_id = r.get('id', '')
+            processed_result.append({'excerpt': excerpt, 'id': entry_id})
+    
+    return jsonify(processed_result)
 
 def title_search_in_db(conn, keyword):
     cursor = conn.cursor()
     cursor.execute("SELECT DISTINCT entry_name FROM entries WHERE entry_name LIKE ? LIMIT 10", (f'%{keyword}%',))
     results = cursor.fetchall()
+    # Convert SQLite Row objects to dictionaries
+    results = [{'entry_name': row[0]} for row in results] if results else []
     return flask.jsonify(results)
 
 def keyword_search_in_db(conn, keyword):
@@ -61,15 +80,18 @@ def keyword_search_in_db(conn, keyword):
         LIMIT 10
     """, (f'%{keyword}%', f'%{keyword}%', f'%{keyword}%', f'%{keyword}%'))
     results = cursor.fetchall()
+    # Convert SQLite Row objects to dictionaries
+    results = [dict(zip([column[0] for column in cursor.description], row)) for row in results] if results else []
     return flask.jsonify(results)
 
 def filter_entries(conn, post_request_form):
-    Authors = post_request_form['Author']
-    Hash_ID = post_request_form['Hash_ID']
-    Text = post_request_form.get('Text', '')
-    Tags = post_request_form.get('Tags', '')
-    Title = post_request_form.get('Title', '')
-    Keyword = post_request_form.get('Keyword', '')
+    # Handle case sensitivity in parameter names
+    Authors = post_request_form.get('Author', post_request_form.get('author', ''))
+    Hash_ID = post_request_form.get('Hash_ID', post_request_form.get('hash_id', ''))
+    Text = post_request_form.get('Text', post_request_form.get('text', ''))
+    Tags = post_request_form.get('Tags', post_request_form.get('tags', ''))
+    Title = post_request_form.get('Title', post_request_form.get('title', ''))
+    Keyword = post_request_form.get('Keyword', post_request_form.get('keyword', ''))
     
     if 'date_bool' not in post_request_form:
         date_bool = False
@@ -163,7 +185,7 @@ def realtime_filter_entries(conn, search_params, offset=0, limit=10):
     else:
         sql_command = 'SELECT * FROM entries WHERE '
         if Authors != '':
-            sql_command += 'author like ? AND '
+            sql_command += 'author like ? OR '
             rows.append(f'%{Authors}%')
         
         # Handle the Keyword field that searches across multiple columns
@@ -276,6 +298,7 @@ def count_matching_entries(conn, search_params):
     sql_command = sql_command + '1'
     rows = tuple(rows)
     cursor = conn.cursor()
+    print(sql_command, rows)
     cursor.execute(sql_command, rows)
     count = cursor.fetchone()[0]
     return count

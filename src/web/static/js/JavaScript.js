@@ -85,10 +85,9 @@ $(document).ready(function(){
           success:function(res){
               var data = "";
               $.each(res,function(index,value){
-                  data += "<a class='search dropdown-item' onclick='put_text(`author_search_datalist`, `author_search`, `"+value[0]+"`)'>";
-                  data += value[0]+"</a>";
+                  data += "<a class='search dropdown-item' onclick='replace_text(`author_search_datalist`, `author_search`, `"+value['author']+"`)'>";
+                  data += value['author']+"</a>";
               });
-              data += "</ul>";
               $("#author_search_datalist").html(data);
           }
       });
@@ -101,8 +100,33 @@ $(document).ready(function(){
     });
   }
   
-  // Similar checks for other elements
-  // ...
+  // For tags_search
+  if ($("#tags_search").length && $("#tags_search_datalist").length) {
+    $("#tags_search").on("input", function(e){
+      $("#tags_search_datalist").css("display", "block");
+      $("#tags_search_datalist").empty();
+      
+      $.ajax({
+          method: "post",
+          url: "/tags_search",
+          data: {text: $("#tags_search").val()},
+          success: function(res){
+              var data = "";
+              $.each(res, function(index, value){
+                  data += "<a class='search dropdown-item' onclick='put_text(`tags_search_datalist`, `tags_search`, `"+value['tag']+"`)'>";
+                  data += value['tag']+"</a>";
+              });
+              $("#tags_search_datalist").html(data);
+          }
+      });
+    });
+    
+    $(document).click(function(e) {
+      if (!$(e.target).is('#tags_search') && $("#tags_search_datalist").length) {
+        $("#tags_search_datalist").css("display", "none");
+      }
+    });
+  }
 });
 
 
@@ -121,8 +145,8 @@ $(document).ready(function(){
           success: function(res){
               var data = "";
               $.each(res, function(index, value){
-                  data += "<a class='search dropdown-item' onclick='replace_text(`tags_search_datalist`, `tags_search`, `"+value[0]+"`)'>";
-                  data += value[0]+"</a>";
+                  data += "<a class='search dropdown-item' onclick='put_text(`tags_search_datalist`, `tags_search`, `"+value['tag']+"`)'>";
+                  data += value['tag']+"</a>";
               });
               data += "</ul>";
               $("#tags_search_datalist").html(data);
@@ -153,8 +177,8 @@ $(document).ready(function(){
           success: function(res){
               var data = "";
               $.each(res, function(index, value){
-                  data += "<a class='search dropdown-item' onclick='put_text(`text_search_datalist`, `text_search`, `"+value[0]+"`)'>";
-                  data += value[0]+"</a>";
+                  data += "<a class='search dropdown-item' onclick='put_text(`text_search_datalist`, `text_search`, `"+value['excerpt']+"`)'>";
+                  data += value['excerpt']+"</a>";
               });
               data += "</ul>";
               $("#text_search_datalist").html(data);
@@ -541,8 +565,8 @@ $(document).ready(function(){
           success: function(res){
               var data = "";
               $.each(res, function(index, value){
-                  data += "<a class='search dropdown-item' onclick='put_text(`keyword_search_datalist`, `keyword_search`, `"+value[0]+"`)'>";
-                  data += value[0]+"</a>";
+                  data += "<a class='search dropdown-item' onclick='put_text(`keyword_search_datalist`, `keyword_search`, `"+value['entry_name']+"`)'>";
+                  data += value['entry_name']+"</a>";
               });
               data += "</ul>";
               $("#keyword_search_datalist").html(data);

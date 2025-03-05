@@ -15,15 +15,70 @@ import zipfile
 import shutil
 import mailing
 import datetime as dt
+import logging
 
 from datetime import datetime, date
 
 from typing import Union
 
+# Define log directory
+log_dir = os.path.join(parent_parent_path, 'logs')
+
+def create_log(log_name, log_level=logging.INFO):
+    """Create a logger with the specified name and level.
+    
+    Args:
+        log_name (str): Name of the log file
+        log_level (int): Logging level (default: logging.INFO)
+        
+    Returns:
+        logging.Logger: Configured logger object
+    """
+    # Create logs directory if it doesn't exist
+    os.makedirs(log_dir, exist_ok=True)
+    
+    # Configure logger
+    logger = logging.getLogger(log_name)
+    logger.setLevel(log_level)
+    
+    # Create file handler
+    log_file = os.path.join(log_dir, f"{log_name}.log")
+    file_handler = logging.FileHandler(log_file)
+    
+    # Create formatter
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    file_handler.setFormatter(formatter)
+    
+    # Add handler to logger
+    logger.addHandler(file_handler)
+    
+    return logger
+
 def error_log(error):
+    """Log an error with traceback information.
+    
+    Args:
+        error: The error to log
+    """
     exc_type, exc_obj, exc_tb = sys.exc_info()
+    
+    # Handle case where there's no traceback (e.g., when called directly with an error)
+    if exc_tb is None:
+        print(f"Error: {str(error)}")
+        
+        # Also log to error log file
+        os.makedirs(log_dir, exist_ok=True)
+        error_logger = create_log('error_log')
+        error_logger.error(f"Error without traceback: {str(error)}")
+        return
+        
     fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
     print(exc_type, fname, exc_tb.tb_lineno)
+    
+    # Also log to error log file
+    os.makedirs(log_dir, exist_ok=True)
+    error_logger = create_log('error_log')
+    error_logger.error(f"{exc_type} in {fname} at line {exc_tb.tb_lineno}: {str(error)}")
 
 def init_directories(DATABASE_FOLDER):
     dir2make = os.path.join(DATABASE_FOLDER, 'uploaded_files')
@@ -50,12 +105,11 @@ def init_db(db_configs):
 def check_existence_table(db_configs):
     conn = db_configs.conn
     cursor = conn.cursor()
-    cursor.execute(''' SELECT count(name) FROM sqlite_master WHERE type='table' AND name=? ''', ['universities'])
+    cursor.execute(''' SELECT count(name) FROM sqlite_master WHERE type='table' AND name=? ''', ['users'])
     if cursor.fetchone()[0]==1:
-        open_bool = 1
+        return True
     else:
-        open_bool = 0
-    return open_bool
+        return False
 
 def check_existence_author(conn, author):
     cursor = conn.cursor()
@@ -105,18 +159,43 @@ def generate_hash(conn):
         return generate_hash(conn)
 
 def entry_list_maker(entries_list):
-    entries_list = list(entries_list)
-    for i, entry in enumerate(entries_list):
-        entry = list(entry)
-        entry[1] = parse_tags(entry[1])
-        entry[6] = parse_conditions(entry[6])
-        for j in range(len(entry[6])):
-            if len(entry[6][j].split('&')) ==3:
-                entry[6][j] = entry[6][j].split('&')[-1]
-            else:
-                entry[6][j] = '->'.join(entry[6][j].split('&')[-2:])
-        entries_list[i] = entry
-    return entries_list
+    result_entries = []
+    for entry in entries_list:
+        # Convert SQLite Row to dict if needed
+        if hasattr(entry, 'keys'):  # Check if it's a Row-like object
+            entry_dict = dict(entry)
+        else:
+            entry_dict = dict(zip(range(len(entry)), entry))
+        
+        # Process tags if they exist
+        if 'tags' in entry_dict and entry_dict['tags']:
+            entry_dict['tags'] = parse_tags(entry_dict['tags'])
+        elif 1 in entry_dict and entry_dict[1]:  # Using numeric index
+            entry_dict[1] = parse_tags(entry_dict[1])
+            
+        # Process conditions if they exist
+        if 'conditions' in entry_dict and entry_dict['conditions']:
+            conditions = parse_conditions(entry_dict['conditions'])
+            processed_conditions = []
+            for condition in conditions:
+                if len(condition.split('&')) == 3:
+                    processed_conditions.append(condition.split('&')[-1])
+                else:
+                    processed_conditions.append('->'.join(condition.split('&')[-2:]))
+            entry_dict['conditions'] = processed_conditions
+        elif 6 in entry_dict and entry_dict[6]:  # Using numeric index
+            conditions = parse_conditions(entry_dict[6])
+            processed_conditions = []
+            for condition in conditions:
+                if len(condition.split('&')) == 3:
+                    processed_conditions.append(condition.split('&')[-1])
+                else:
+                    processed_conditions.append('->'.join(condition.split('&')[-2:]))
+            entry_dict[6] = processed_conditions
+            
+        result_entries.append(entry_dict)
+    
+    return result_entries
 
 def check_for_internet_connection():
     try:
@@ -445,10 +524,34 @@ def get_email_address_by_user_name(conn, user_name):
     return user[0]
 
 def check_emails_validity(emails: Union[list, tuple]) -> bool:
-    for email in emails:
-        if '@' not in email or '.' not in email:
-            return False
-    return True
+    """Check if all emails in a list are valid.
+    
+    Args:
+        emails (Union[list, tuple]): List of email addresses to check
+        
+    Returns:
+        bool: True if all emails are valid, False otherwise
+    """
+    if not emails:
+        return False
+    return all(is_valid_email(email) for email in emails)
+
+def is_valid_email(email: str) -> bool:
+    """Check if an email address is valid.
+    
+    Args:
+        email (str): Email address to validate
+        
+    Returns:
+        bool: True if the email is valid, False otherwise
+    """
+    if not email or not isinstance(email, str):
+        return False
+        
+    # Basic email validation
+    import re
+    email_pattern = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+    return bool(email_pattern.match(email))
 
 def add_notification(conn, author, message, destination, notification_type, reference_id=None):
     """Add a notification to the notifications table"""
@@ -459,3 +562,11 @@ def add_notification(conn, author, message, destination, notification_type, refe
         VALUES (?, ?, ?, ?, ?, ?, 0)
     """, (author, message, dt.datetime.now(), destination, notification_type, reference_id))
     conn.commit()
+
+def get_column_names(conn, table_name):
+    """Get column names for a specified table."""
+    cursor = conn.cursor()
+    cursor.execute(f"PRAGMA table_info({table_name})")
+    columns = cursor.fetchall()
+    column_names = [column[1] for column in columns]  # Column name is the second field
+    return column_names

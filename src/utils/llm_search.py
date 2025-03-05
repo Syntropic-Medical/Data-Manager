@@ -8,22 +8,33 @@ from dotenv import load_dotenv
 
 class ExternalLLMSearch:
     """Search assistant that uses Claude API rather than loading models locally"""
-    def __init__(self, api_key=None):
+    def __init__(self, api_key=None, testing_mode=False):
         """
         Initialize the LLM search assistant using Claude API
         
         Args:
             api_key: API key for Claude (can be set via environment variable)
+            testing_mode: If True, skip API initialization for testing
         """
-        # Load environment variables if not already loaded
+        self.ready = False
+        self.testing_mode = testing_mode
+        
+        if testing_mode:
+            self.api_key = "test_api_key"
+            self.ready = True
+            return
+            
+        # Load environment variables from .env file
         load_dotenv()
         
+        # Get API key from environment or parameter
         self.api_key = api_key or os.environ.get("CLAUDE_API_KEY")
-        self.ready = self.api_key is not None
-        if not self.ready:
-            print("Warning: No API key provided for Claude API. Set CLAUDE_API_KEY environment variable.")
-        else:
-            print("Claude API service initialized.")
+        
+        if not self.api_key:
+            print("WARNING: Claude API key not provided. Set the CLAUDE_API_KEY environment variable.")
+            return
+            
+        self.ready = True
     
     def _generate_prompt(self, user_query, current_date):
         prompt = f"""
@@ -73,17 +84,40 @@ class ExternalLLMSearch:
         return prompt
     
     def extract_search_params(self, user_query):
-        """Query Claude API to extract search parameters from natural language"""
-        print(f"Received query: {user_query}")
-        
+        """Extract search parameters from a natural language query using Claude API."""
         if not self.ready:
-            print("Claude API is not configured (no API key)")
-            # Fallback to basic keyword extraction
-            return self._fallback_extraction(user_query)
+            print("Claude API not initialized. Cannot process query.")
+            return None
+            
+        # If in testing mode, return mock search parameters
+        if self.testing_mode:
+            # Create simplified mock search parameters based on the query
+            mock_params = {"text": "", "author": "", "date_from": None, "date_to": None}
+            
+            # Extract basic parameters from the query
+            if "about" in user_query.lower():
+                text_parts = user_query.lower().split("about")
+                if len(text_parts) > 1:
+                    mock_params["text"] = text_parts[1].split("from")[0].strip()
+            
+            if "by" in user_query.lower():
+                author_parts = user_query.lower().split("by")
+                if len(author_parts) > 1:
+                    mock_params["author"] = author_parts[1].split("about")[0].strip()
+            
+            # Handle date ranges
+            if "last week" in user_query.lower():
+                today = datetime.datetime.now()
+                mock_params["date_from"] = (today - datetime.timedelta(days=7)).strftime("%Y-%m-%d")
+                mock_params["date_to"] = today.strftime("%Y-%m-%d")
+                
+            return mock_params
+            
+        # Regular processing with Claude API
+        current_date = datetime.datetime.now().strftime("%Y-%m-%d")
+        prompt = self._generate_prompt(user_query, current_date)
         
         try:
-            prompt = self._generate_prompt(user_query, current_date=datetime.datetime.now().strftime("%Y-%m-%d"))
-            
             # Claude API specific headers
             headers = {
                 "Content-Type": "application/json",
@@ -111,7 +145,7 @@ class ExternalLLMSearch:
             
             if response.status_code != 200:
                 print(f"API error: {response.status_code}, {response.text}")
-                return self._fallback_extraction(user_query)
+                return None
             
             result = response.json()
             
@@ -124,7 +158,7 @@ class ExternalLLMSearch:
                         response_text += content_block["text"]
             else:
                 print("Unexpected Claude API response format")
-                return self._fallback_extraction(user_query)
+                return None
             
             print(f"Claude response: {response_text}")
             
@@ -146,13 +180,13 @@ class ExternalLLMSearch:
             
             # If we couldn't extract valid JSON, fall back to our keyword extraction
             print("Could not extract valid JSON from Claude response")
-            return self._fallback_extraction(user_query)
+            return None
         
         except Exception as e:
             print(f"Error querying Claude API: {str(e)}")
             import traceback
             traceback.print_exc()
-            return self._fallback_extraction(user_query)
+            return None
     
     def _fallback_extraction(self, user_query):
         """Simple fallback keyword extraction when LLM is unavailable"""
