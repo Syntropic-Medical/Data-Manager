@@ -185,8 +185,13 @@ def realtime_filter_entries(conn, search_params, offset=0, limit=10):
     else:
         sql_command = 'SELECT * FROM entries WHERE '
         if Authors != '':
-            sql_command += 'author like ? OR '
-            rows.append(f'%{Authors}%')
+            Authors = Authors.split(',')
+            for author in Authors:
+                if author.replace(' ', '') != '':
+                    sql_command += 'author like ? OR '
+                    rows.append(f'%{author}%')
+            sql_command = sql_command[:-4]
+            sql_command += ' AND '
         
         # Handle the Keyword field that searches across multiple columns
         if Keyword != '':
@@ -305,10 +310,7 @@ def count_matching_entries(conn, search_params):
 
 def entries_time_line(conn):
     cursor = conn.cursor()
-    if flask.session['admin']:
-        cursor.execute("SELECT * FROM entries ORDER BY date DESC LIMIT 12")         
-    else:
-        cursor.execute("SELECT * FROM entries WHERE author == ? ORDER BY date DESC LIMIT 12", (flask.session['username'],))                              
+    cursor.execute("SELECT * FROM entries WHERE author == ? ORDER BY date DESC LIMIT 12", (flask.session['username'],))                              
     entries_list = cursor.fetchall()
     entries_list=  utils.entry_list_maker(entries_list)
     return entries_list

@@ -1,11 +1,14 @@
 function put_text(id_parent, id, txt) {     
   document.getElementById(id).value = txt;
   document.getElementById(id_parent).style.display = "none";
+  
+  // Trigger the input event to update search results
+  const inputEvent = new Event('input', { bubbles: true });
+  document.getElementById(id).dispatchEvent(inputEvent);
+};
 
- };
 
-
- function replace_text(id_parent, id, txt) {
+function replace_text(id_parent, id, txt) {
   input_txt = document.getElementById(id).value;
   index = input_txt.indexOf(",");
   if (index != -1) {
@@ -22,10 +25,12 @@ function put_text(id_parent, id, txt) {
     input_txt = txt;
   }
   document.getElementById(id).value = input_txt;
-
   document.getElementById(id_parent).style.display = "none";
-
- };
+  
+  // Trigger the input event to update search results
+  const inputEvent = new Event('input', { bubbles: true });
+  document.getElementById(id).dispatchEvent(inputEvent);
+};
 
 
  // make a function called replace_condition_trigger which will be called when the user selects a template name or a method name

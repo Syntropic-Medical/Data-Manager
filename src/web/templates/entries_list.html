@@ -146,43 +146,5 @@
     </div>
 </form>
 
-<script>
-    function submitForm(action) {
-        document.getElementById('action_input').value = action;
-        document.querySelector('form').submit();
-    }
-    
-    function copy_2_clipboard(element) {
-        navigator.clipboard.writeText(element.textContent);
-        
-        // Show a temporary tooltip
-        const tooltip = document.createElement('div');
-        tooltip.textContent = 'Copied!';
-        tooltip.style.position = 'fixed';
-        tooltip.style.left = (event.clientX + 10) + 'px';
-        tooltip.style.top = (event.clientY - 10) + 'px';
-        tooltip.style.backgroundColor = 'rgba(0,0,0,0.7)';
-        tooltip.style.color = 'white';
-        tooltip.style.padding = '5px 10px';
-        tooltip.style.borderRadius = '3px';
-        tooltip.style.zIndex = '1000';
-        document.body.appendChild(tooltip);
-        
-        setTimeout(() => {
-            tooltip.remove();
-        }, 1000);
-    }
-    
-    // Add select all functionality
-    document.addEventListener('DOMContentLoaded', function() {
-        const selectAllCheckbox = document.getElementById('selectAll');
-        if (selectAllCheckbox) {
-            selectAllCheckbox.addEventListener('change', function() {
-                const checkboxes = document.querySelectorAll('.entry-checkbox');
-                checkboxes.forEach(checkbox => {
-                    checkbox.checked = selectAllCheckbox.checked;
-                });
-            });
-        }
-    });
-</script>
+<!-- Include the entries list JavaScript file -->
+<script src="{{ url_for('static_dir', filename='js/entries_list.js') }}"></script>

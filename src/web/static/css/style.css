@@ -659,4 +659,21 @@ th[data-sort="desc"] .sort-indicator {
     cursor: help;
 }
 
+/* Table Sorting Styles */
+.table-sortable th.sortable {
+  position: relative;
+  cursor: pointer;
+  user-select: none;
+}
+
+.table-sortable th.sortable:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.sort-indicator {
+  display: inline-block;
+  margin-left: 5px;
+  font-size: 0.8em;
+}
+
 

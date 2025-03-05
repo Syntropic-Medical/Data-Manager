@@ -642,7 +642,8 @@ class WebApp():
                              os.path.join('static', 'js', 'orders.js'),
                              os.path.join('static', 'js', 'chatbot.js'),
                              os.path.join('static', 'css', 'chatbot.css'),
-                             os.path.join('static', 'js', 'table_sorting.js')]
+                             os.path.join('static', 'js', 'table_sorting.js'),
+                             os.path.join('static', 'js', 'entries_list.js')]
             
             if filename in allowed_files:
                 return flask.send_from_directory(app.root_path, filename)
