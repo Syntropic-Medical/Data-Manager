@@ -619,7 +619,7 @@ class WebApp():
         @self.logger
         def update_conditions_templates_in_db():
             post_form = flask.request.form
-            print(post_form)
+
             success_bool = operators.update_conditions_templates(self.db_configs.conn, post_form, flask.session['username'])
 
             if success_bool:
@@ -1593,11 +1593,7 @@ class WebApp():
         @security.login_required
         def unread_notifications():
             cursor = self.db_configs.conn.cursor()
-            cursor.execute("""
-                SELECT * 
-                FROM notifications 
-                WHERE destination = ? AND read = 0
-            """, (flask.session['username'],))
+            cursor.execute(""" SELECT * FROM notifications WHERE destination = ? AND read = 0 """, (flask.session['username'],))
 
             notifications = cursor.fetchall()
             columns = [column[0] for column in cursor.description]

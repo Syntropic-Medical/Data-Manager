@@ -408,6 +408,21 @@ def insert_conditions(conn, conditions):
 def update_conditions_templates(conn, post_form, username):
     post_form = post_form.to_dict()
     new_template_name = post_form['new_template_name']
+    template_delete_bool = False
+
+    for key, _ in post_form.items():
+        if 'delete' == key.split('&')[0]:
+            # remove template
+            template_name = key.split('&')[1]
+            cursor = conn.cursor()
+            cursor.execute('delete from conditions_templates where author=? and template_name=?', (username, template_name))
+            conn.commit()
+            template_delete_bool = True
+    if new_template_name.replace(' ', '') == '' and template_delete_bool == False:
+        return False
+    elif new_template_name.replace(' ', '') == '' and template_delete_bool == True:
+        return True
+
     conditions = []
     for key, _ in post_form.items():
         if 'condition' == key.split('&')[0]:
@@ -430,17 +445,8 @@ def update_conditions_templates(conn, post_form, username):
         elif template_name != '':
             cursor.execute('update conditions_templates set conditions=? where author=? and template_name=?', (condition_this_template_list, username, template_name))
         conn.commit()
-    
-    for key, _ in post_form.items():
-        if 'delete' == key.split('&')[0]:
-            # remove template
-            template_name = key.split('&')[1]
-            cursor = conn.cursor()
-            cursor.execute('delete from conditions_templates where author=? and template_name=?', (username, template_name))
-            conn.commit()
-            
-    return True
 
+    return True
 def get_conditions_by_template_and_method(conn, username, template_name, method_name):
     try:
         cursor = conn.cursor()
