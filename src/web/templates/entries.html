@@ -154,5 +154,68 @@
   </div>
 </div>
 
+<!-- Form for actions -->
+<form action="{{ url_for('entries_actions')}}" method=post enctype=multipart/form-data id="actionsForm">
+  <!-- Hidden action input for form submission -->
+  <input type="hidden" name="action" id="action_input" value="">
+  
+  <!-- Email Notification Modal -->
+  <div class="modal fade" id="emailNotifyModal" tabindex="-1" aria-labelledby="emailNotifyModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="emailNotifyModalLabel">Notify Users by Email</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                  <div class="mb-3">
+                      <label for="adress_for_notify_by_email" class="form-label">Recipients (comma-separated usernames)</label>
+                      <div class="position-relative">
+                          <input type="text" class="form-control" id="adress_for_notify_by_email" 
+                                name="adress_for_notify_by_email" placeholder="Type usernames..." 
+                                autocomplete="off">
+                          <div class="dropdown-menu w-100" id="username_suggestions" 
+                              style="display:none; max-height: 200px; overflow-y: auto;"></div>
+                      </div>
+                      <div class="form-text">
+                          Selected users will receive an email with reports for the selected entries
+                      </div>
+                  </div>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                  <button type="button" class="btn btn-primary" onclick="submitForm('notify_by_email')">Send Notification</button>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+  <!-- Set Parent Entry Modal -->
+  <div class="modal fade" id="setParentModal" tabindex="-1" aria-labelledby="setParentModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="setParentModalLabel">Set Parent Entry</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                  <div class="mb-3">
+                      <label for="parent_entry_hash_id" class="form-label">Parent Entry Hash ID</label>
+                      <input type="text" class="form-control" id="parent_entry_hash_id" 
+                            name="parent_entry_hash_id" placeholder="Enter parent entry hash ID">
+                      <div class="form-text">
+                          All selected entries will be linked to this parent entry
+                      </div>
+                  </div>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                  <button type="button" class="btn btn-primary" onclick="submitForm('set_parent_entry')">Set Parent</button>
+              </div>
+          </div>
+      </div>
+  </div>
+</form>
+
 <script src="{{ url_for('static_dir', filename='static/js/entries_list.js') }}"></script>
 {% endblock %}

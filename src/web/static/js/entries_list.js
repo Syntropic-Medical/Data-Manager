@@ -8,14 +8,48 @@
  * @param {string} action - The action to perform
  */
 function submitForm(action) {
-    const actionInput = document.getElementById('action_input');
-    const form = document.querySelector('form');
+    // Check if we're in a modal (using actionsForm) or in the results table
+    const isModal = document.querySelector('.modal.show') !== null;
     
-    if (actionInput && form) {
-        actionInput.value = action;
-        form.submit();
+    if (isModal) {
+        // We're in a modal, use the actionsForm
+        const actionInput = document.getElementById('action_input');
+        const form = document.getElementById('actionsForm');
+        
+        if (actionInput && form) {
+            // Transfer all checked checkboxes from the search results to the actions form
+            const checkedBoxes = document.querySelectorAll('.entry-checkbox:checked');
+            
+            // First, remove any existing checkboxes from previous submissions
+            const existingInputs = form.querySelectorAll('input[name^="Select&"]');
+            existingInputs.forEach(input => input.remove());
+            
+            // Add the checked checkboxes to the form
+            checkedBoxes.forEach(checkbox => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = checkbox.id;
+                input.value = 'on';
+                form.appendChild(input);
+            });
+            
+            // Set the action and submit
+            actionInput.value = action;
+            form.submit();
+        } else {
+            console.error('Form or action input element not found');
+        }
     } else {
-        console.error('Form or action input element not found');
+        // We're in the results table, use the form in the results container
+        const resultsForm = document.querySelector('#resultsContainer form');
+        const actionInput = document.getElementById('results_action_input');
+        
+        if (resultsForm && actionInput) {
+            actionInput.value = action;
+            resultsForm.submit();
+        } else {
+            console.error('Results form or action input element not found');
+        }
     }
 }
 
@@ -357,22 +391,23 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
       }
       
-      // Create table HTML
+      // Create table HTML - wrap in a form
       let tableHtml = `
-        <div class="table-responsive p-3">
-          <table class="table table-hover table-bordered table-striped table-sortable">
-            <thead class="table-dark">
-              <tr>
-                <th scope="col" width="2.5%" class="text-center"><input type="checkbox" id="selectAll" class="form-check-input"></th>
-                <th scope="col" width="35%" class="text-center">Title</th>
-                <th scope="col" width="15%" class="text-center">Hash ID</th>
-                <th scope="col" width="15%" class="text-center">Date</th>
-                <th scope="col" width="5%" class="text-center">Author</th>
-                <th scope="col" width="13.75%" class="text-center">Tags</th>
-                <th scope="col" width="13.75%" class="text-center">Conditions</th>
-              </tr>
-            </thead>
-            <tbody>
+        <form action="${document.getElementById('actionsForm').action}" method="post" enctype="multipart/form-data">
+          <div class="table-responsive p-3">
+            <table class="table table-hover table-bordered table-striped table-sortable">
+              <thead class="table-dark">
+                <tr>
+                  <th scope="col" width="2.5%" class="text-center"><input type="checkbox" id="selectAll" class="form-check-input"></th>
+                  <th scope="col" width="35%" class="text-center">Title</th>
+                  <th scope="col" width="15%" class="text-center">Hash ID</th>
+                  <th scope="col" width="15%" class="text-center">Date</th>
+                  <th scope="col" width="5%" class="text-center">Author</th>
+                  <th scope="col" width="13.75%" class="text-center">Tags</th>
+                  <th scope="col" width="13.75%" class="text-center">Conditions</th>
+                </tr>
+              </thead>
+              <tbody>
       `;
       
       // Add rows for each entry
@@ -408,6 +443,44 @@ document.addEventListener('DOMContentLoaded', function() {
             </tbody>
           </table>
         </div>
+      `;
+      
+      // Add the actions button section
+      tableHtml += `
+        <div class="input-group mb-3 row mx-1 p-4 bg-light rounded">
+            <div class="col-md-3">
+                <div class="dropdown">
+                    <button class="btn btn-primary dropdown-toggle w-100" type="button" id="actionDropdown" 
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-gear me-1"></i> Actions
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="actionDropdown">
+                        <li>
+                            <button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#emailNotifyModal">
+                                <i class="bi bi-envelope me-2"></i> Notify by Email
+                            </button>
+                        </li>
+                        <li>
+                            <button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#setParentModal">
+                                <i class="bi bi-diagram-3 me-2"></i> Set Parent Entry
+                            </button>
+                        </li>
+                        <li>
+                            <button type="button" class="dropdown-item" onclick="submitForm('bulk_report')">
+                                <i class="bi bi-file-earmark-text me-2"></i> Generate Reports
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="alert alert-info mb-0">
+                    <i class="bi bi-info-circle me-2"></i> Select entries and choose an action from the dropdown
+                </div>
+            </div>
+        </div>
+        <input type="hidden" name="action" id="results_action_input" value="">
+        </form>
       `;
       
       // Update results container
