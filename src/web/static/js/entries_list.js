@@ -8,8 +8,15 @@
  * @param {string} action - The action to perform
  */
 function submitForm(action) {
-    document.getElementById('action_input').value = action;
-    document.querySelector('form').submit();
+    const actionInput = document.getElementById('action_input');
+    const form = document.querySelector('form');
+    
+    if (actionInput && form) {
+        actionInput.value = action;
+        form.submit();
+    } else {
+        console.error('Form or action input element not found');
+    }
 }
 
 /**
@@ -230,13 +237,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const dateStart = document.getElementById('date_start');
     const dateEnd = document.getElementById('date_end');
     
-    function updateDateFields() {
-      const isEnabled = dateCheckbox.checked;
-      dateStart.disabled = !isEnabled;
-      dateEnd.disabled = !isEnabled;
-    }
-    
-    if (dateCheckbox) {
+    if (dateCheckbox && dateStart && dateEnd) {
+      function updateDateFields() {
+        const isEnabled = dateCheckbox.checked;
+        dateStart.disabled = !isEnabled;
+        dateEnd.disabled = !isEnabled;
+      }
+      
       dateCheckbox.addEventListener('change', updateDateFields);
       // Initialize on page load
       updateDateFields();
@@ -247,19 +254,21 @@ document.addEventListener('DOMContentLoaded', function() {
     const advancedSearchCollapse = document.getElementById('advancedSearchCollapse');
     const collapseIcon = document.getElementById('collapseIcon');
     
-    advancedSearchToggle.addEventListener('click', function() {
-      const isVisible = advancedSearchCollapse.style.display !== 'none';
-      
-      if (isVisible) {
-        advancedSearchCollapse.style.display = 'none';
-        collapseIcon.classList.remove('bi-chevron-up');
-        collapseIcon.classList.add('bi-chevron-down');
-      } else {
-        advancedSearchCollapse.style.display = 'block';
-        collapseIcon.classList.remove('bi-chevron-down');
-        collapseIcon.classList.add('bi-chevron-up');
-      }
-    });
+    if (advancedSearchToggle && advancedSearchCollapse && collapseIcon) {
+      advancedSearchToggle.addEventListener('click', function() {
+        const isVisible = advancedSearchCollapse.style.display !== 'none';
+        
+        if (isVisible) {
+          advancedSearchCollapse.style.display = 'none';
+          collapseIcon.classList.remove('bi-chevron-up');
+          collapseIcon.classList.add('bi-chevron-down');
+        } else {
+          advancedSearchCollapse.style.display = 'block';
+          collapseIcon.classList.remove('bi-chevron-down');
+          collapseIcon.classList.add('bi-chevron-up');
+        }
+      });
+    }
     
     // Real-time search functionality
     let searchTimeout;
@@ -268,22 +277,35 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to perform real-time search
     function performRealTimeSearch() {
-      const formData = new FormData(document.getElementById('searchForm'));
-      formData.append('offset', 0);
-      formData.append('limit', 10);
+      const searchForm = document.getElementById('searchForm');
+      if (!searchForm) {
+        console.error('Search form not found');
+        return;
+      }
+      
+      const formData = new FormData(searchForm);
+      
+      // Add offset for pagination
+      formData.append('offset', currentOffset);
       
       // Show loading indicator
-      document.getElementById('resultsContainer').innerHTML = `
-        <div class="text-center p-4">
-          <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Loading...</span>
+      const resultsContainer = document.getElementById('resultsContainer');
+      if (resultsContainer) {
+        resultsContainer.innerHTML = `
+          <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Searching...</p>
           </div>
-          <p class="mt-2">Searching...</p>
-        </div>
-      `;
+        `;
+      }
       
       // Show results card
-      document.getElementById('resultsCard').style.display = 'block';
+      const resultsCard = document.getElementById('resultsCard');
+      if (resultsCard) {
+        resultsCard.style.display = 'block';
+      }
       
       // Reset pagination
       currentOffset = 0;
@@ -300,30 +322,38 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Update pagination
         const loadMoreContainer = document.getElementById('loadMoreContainer');
-        if (data.has_more) {
-          loadMoreContainer.style.display = 'block';
-        } else {
-          loadMoreContainer.style.display = 'none';
+        if (loadMoreContainer) {
+          if (data.has_more) {
+            loadMoreContainer.style.display = 'block';
+          } else {
+            loadMoreContainer.style.display = 'none';
+          }
         }
       })
       .catch(error => {
         console.error('Error performing real-time search:', error);
-        document.getElementById('resultsContainer').innerHTML = `
-          <div class="alert alert-danger m-3">
-            <i class="bi bi-exclamation-triangle me-2"></i> Error performing search
-          </div>
-        `;
+        const resultsContainer = document.getElementById('resultsContainer');
+        if (resultsContainer) {
+          resultsContainer.innerHTML = `
+            <div class="alert alert-danger m-3">
+              <i class="bi bi-exclamation-triangle me-2"></i> Error performing search
+            </div>
+          `;
+        }
       });
     }
     
     // Function to update results table
     function updateResultsTable(entries) {
       if (entries.length === 0) {
-        document.getElementById('resultsContainer').innerHTML = `
-          <div class="alert alert-info m-3">
-            <i class="bi bi-info-circle me-2"></i> No entries found
-          </div>
-        `;
+        const resultsContainer = document.getElementById('resultsContainer');
+        if (resultsContainer) {
+          resultsContainer.innerHTML = `
+            <div class="alert alert-info text-center">
+              No entries found matching your search criteria.
+            </div>
+          `;
+        }
         return;
       }
       
@@ -381,7 +411,10 @@ document.addEventListener('DOMContentLoaded', function() {
       `;
       
       // Update results container
-      document.getElementById('resultsContainer').innerHTML = tableHtml;
+      const resultsContainer = document.getElementById('resultsContainer');
+      if (resultsContainer) {
+        resultsContainer.innerHTML = tableHtml;
+      }
       
       // Add select all functionality
       const selectAllCheckbox = document.getElementById('selectAll');
@@ -399,101 +432,123 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Add event listeners to search fields
-    document.querySelectorAll('.realtime-search').forEach(input => {
-      input.addEventListener('input', function() {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(performRealTimeSearch, searchDelay);
-      });
-      
-      if (input.type === 'checkbox') {
-        input.addEventListener('change', function() {
+    const realtimeSearchInputs = document.querySelectorAll('.realtime-search');
+    if (realtimeSearchInputs.length > 0) {
+      realtimeSearchInputs.forEach(input => {
+        input.addEventListener('input', function() {
           clearTimeout(searchTimeout);
           searchTimeout = setTimeout(performRealTimeSearch, searchDelay);
         });
-      }
-    });
+        
+        if (input.type === 'checkbox') {
+          input.addEventListener('change', function() {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(performRealTimeSearch, searchDelay);
+          });
+        }
+      });
+    }
     
     // Handle form reset
-    document.getElementById('resetFormBtn').addEventListener('click', function() {
-      setTimeout(function() {
-        document.getElementById('resultsCard').style.display = 'none';
-      }, 100);
-    });
+    const resetFormBtn = document.getElementById('resetFormBtn');
+    if (resetFormBtn) {
+      resetFormBtn.addEventListener('click', function() {
+        const resultsCard = document.getElementById('resultsCard');
+        if (resultsCard) {
+          setTimeout(function() {
+            resultsCard.style.display = 'none';
+          }, 100);
+        }
+      });
+    }
     
     // Load more results functionality
-    document.getElementById('loadMoreResults').addEventListener('click', function() {
-      const button = this;
-      button.disabled = true;
-      button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...';
-      
-      // Increment offset for pagination
-      currentOffset += 10;
-      
-      // Get form data
-      const formData = new FormData(document.getElementById('searchForm'));
-      formData.append('offset', currentOffset);
-      formData.append('limit', 10);
-      
-      // Send AJAX request
-      fetch('/realtime_search', {
-        method: 'POST',
-        body: formData
-      })
-      .then(response => response.json())
-      .then(data => {
-        // Get table body
-        const tbody = document.querySelector('.table tbody');
+    const loadMoreResults = document.getElementById('loadMoreResults');
+    if (loadMoreResults) {
+      loadMoreResults.addEventListener('click', function() {
+        const button = this;
+        button.disabled = true;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Loading...';
         
-        // Add new rows
-        data.entries.forEach(entry => {
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td class="text-center align-middle py-3">
-              <input class="form-check-input entry-checkbox" type="checkbox" id="Select&${entry.id}" name="Select&${entry.id}">
-            </td>
-            <td class="align-middle py-3">
-              <a href="/entry/${entry.id}" class="text-decoration-none">
-                <span class="fw-bold">${entry.title}</span>
-              </a>
-            </td>
-            <td class="align-middle py-3">
-              <div class="d-flex align-items-center">
-                <span class="text-monospace font-monospace small" id="hash_id_${entry.hash_id}">${entry.hash_id}</span>
-              </div>
-            </td>
-            <td class="align-middle py-3">${entry.date}</td>
-            <td class="align-middle py-3">${entry.author}</td>
-            <td class="align-middle py-3">
-              ${Array.isArray(entry.tags) ? entry.tags.map(tag => `<span class="text-dark me-1">${tag}</span>`).join('') : ''}
-            </td>
-            <td class="align-middle py-3">
-              ${Array.isArray(entry.conditions) ? entry.conditions.map(condition => `<span class="text-dark me-1">${condition}</span>`).join('') : ''}
-            </td>
-          `;
-          tbody.appendChild(row);
+        // Increment offset for pagination
+        currentOffset += 10;
+        
+        // Get form data
+        const searchForm = document.getElementById('searchForm');
+        if (!searchForm) {
+          console.error('Search form not found');
+          button.disabled = false;
+          return;
+        }
+        
+        const formData = new FormData(searchForm);
+        formData.append('offset', currentOffset);
+        formData.append('limit', 10);
+        
+        // Send AJAX request
+        fetch('/realtime_search', {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          // Get table body
+          const tbody = document.querySelector('.table tbody');
+          
+          // Add new rows
+          data.entries.forEach(entry => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td class="text-center align-middle py-3">
+                <input class="form-check-input entry-checkbox" type="checkbox" id="Select&${entry.id}" name="Select&${entry.id}">
+              </td>
+              <td class="align-middle py-3">
+                <a href="/entry/${entry.id}" class="text-decoration-none">
+                  <span class="fw-bold">${entry.title}</span>
+                </a>
+              </td>
+              <td class="align-middle py-3">
+                <div class="d-flex align-items-center">
+                  <span class="text-monospace font-monospace small" id="hash_id_${entry.hash_id}">${entry.hash_id}</span>
+                </div>
+              </td>
+              <td class="align-middle py-3">${entry.date}</td>
+              <td class="align-middle py-3">${entry.author}</td>
+              <td class="align-middle py-3">
+                ${Array.isArray(entry.tags) ? entry.tags.map(tag => `<span class="text-dark me-1">${tag}</span>`).join('') : ''}
+              </td>
+              <td class="align-middle py-3">
+                ${Array.isArray(entry.conditions) ? entry.conditions.map(condition => `<span class="text-dark me-1">${condition}</span>`).join('') : ''}
+              </td>
+            `;
+            tbody.appendChild(row);
+          });
+          
+          // Update button state
+          button.disabled = false;
+          button.innerHTML = '<i class="bi bi-arrow-down-circle me-1"></i> Show More Results';
+          
+          // Hide button if no more results
+          if (!data.has_more) {
+            const loadMoreContainer = document.getElementById('loadMoreContainer');
+            if (loadMoreContainer) {
+              loadMoreContainer.style.display = 'none';
+            }
+          }
+          
+          // Re-apply sorting if a column is already sorted
+          const sortedHeader = document.querySelector('th[data-sort]');
+          if (sortedHeader) {
+            const table = document.querySelector('.table-sortable');
+            const headerIndex = Array.from(sortedHeader.parentNode.children).indexOf(sortedHeader);
+            sortTable(table, headerIndex, sortedHeader);
+          }
+        })
+        .catch(error => {
+          console.error('Error loading more results:', error);
+          button.disabled = false;
+          button.innerHTML = '<i class="bi bi-arrow-down-circle me-1"></i> Show More Results';
         });
-        
-        // Update button state
-        button.disabled = false;
-        button.innerHTML = '<i class="bi bi-arrow-down-circle me-1"></i> Show More Results';
-        
-        // Hide button if no more results
-        if (!data.has_more) {
-          document.getElementById('loadMoreContainer').style.display = 'none';
-        }
-        
-        // Re-apply sorting if a column is already sorted
-        const sortedHeader = document.querySelector('th[data-sort]');
-        if (sortedHeader) {
-          const table = document.querySelector('.table-sortable');
-          const headerIndex = Array.from(sortedHeader.parentNode.children).indexOf(sortedHeader);
-          sortTable(table, headerIndex, sortedHeader);
-        }
-      })
-      .catch(error => {
-        console.error('Error loading more results:', error);
-        button.disabled = false;
-        button.innerHTML = '<i class="bi bi-arrow-down-circle me-1"></i> Show More Results';
       });
-    });
+    }
   });

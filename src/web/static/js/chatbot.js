@@ -18,6 +18,12 @@ document.addEventListener('DOMContentLoaded', function() {
   // State
   let isModelReady = false;
   
+  // Wait for a longer time to ensure all dependencies are loaded
+  setTimeout(function() {
+    // Initialize chatbot
+    initChatbot();
+  }, 500);
+  
   // Initialize chatbot
   function initChatbot() {
     // Add event listeners
@@ -25,12 +31,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Add welcome message with a small delay to ensure libraries are loaded
     setTimeout(() => {
-      // Test Markdown parsing
-      console.log('Testing Markdown parsing:');
-      const testMarkdown = '**Bold text** and *italic text* and a list:\n- Item 1\n- Item 2';
-      console.log('Input:', testMarkdown);
-      console.log('Output:', marked.parse(testMarkdown));
-      
       // Add welcome message
       addWelcomeMessage();
       
@@ -290,7 +290,4 @@ How can I assist you today?`;
       });
     });
   }
-  
-  // Initialize the chatbot
-  initChatbot();
 }); 

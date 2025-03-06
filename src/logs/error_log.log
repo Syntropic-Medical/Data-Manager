@@ -18443,3 +18443,4 @@
 2025-03-06 10:39:25,799 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
 2025-03-06 10:39:25,799 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
 2025-03-06 10:39:25,799 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-06 11:21:16,460 - error_log - ERROR - <class 'sqlite3.ProgrammingError'> in operators.py at line 726: Incorrect number of bindings supplied. The current statement uses 0, and there are 1 supplied.

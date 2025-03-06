@@ -44,7 +44,7 @@ class ExternalLLMSearch:
         3. Explaining software functionality based on the current interface
 
         You should:
-        - Only answer questions related to using the software or searching entries
+        - Only answer questions related to using the software or searching entries or related to entries
         - Politely decline to answer personal questions or topics unrelated to the software
         - Keep responses focused on practical software usage
         - Be friendly but professional
@@ -75,9 +75,11 @@ class ExternalLLMSearch:
         Here is the current date:
         "{current_date}"
 
-        If this is a search query, respond with a valid JSON object containing the search parameters and put a filed called 'is_usage_question' with a value of false.
-        If this is a question about using the software, provide a helpful explanation focused on user interface and functionality and put a filed called 'is_usage_question' with a value of true and a filed called 'explanation' with a value of the explanation of why you can't help with the question.
-        If this is an unrelated question, politely explain that you can only help with software usage and searches and put a filed called 'is_usage_question' with a value of true and a filed called 'explanation' with a value of the explanation of why you can't help with the question.
+        If this is a search query, respond with a valid JSON object containing the search parameters and include a field called 'is_usage_question' with a value of false.
+        
+        If this is a question about using the software or an unrelated question, format your response like this:
+        <is_usage_question>true</is_usage_question>
+        <explanation>Your helpful explanation focused on user interface and functionality, or an explanation of why you can't help with the question.</explanation>
 
         NEVER EVER introduce yourself at the beginning of your response.
         """
@@ -162,31 +164,157 @@ class ExternalLLMSearch:
             
             print(f"Claude response: {response_text}")
             
-            # Extract JSON from the response
-            json_match = re.search(r'\{.*\}', response_text, re.DOTALL)
-            if json_match:
-                json_str = json_match.group(0)
-                try:
-                    search_params = json.loads(json_str)
-                    self._process_relative_dates(search_params)
-                    return search_params
-                except json.JSONDecodeError as e:
-                    print(f"JSON parsing error: {str(e)}")
-                    fixed_json = self._fix_json(json_str)
-                    if fixed_json:
-                        search_params = fixed_json
-                        self._process_relative_dates(search_params)
-                        return search_params
+            # Process the LLM response
+            search_params = self._process_llm_response(response_text)
+            if search_params:
+                return search_params
             
-            # If we couldn't extract valid JSON, fall back to our keyword extraction
-            print("Could not extract valid JSON from Claude response")
-            return None
+            # If processing failed, make a follow-up request for structured data
+            search_params = self._request_structured_data(user_query)
+            return search_params
         
         except Exception as e:
             print(f"Error querying Claude API: {str(e)}")
             import traceback
             traceback.print_exc()
             return None
+    
+    def _process_llm_response(self, response_text):
+        """Process the LLM response and extract structured data"""
+        # First, try to parse as JSON
+        try:
+            search_params = json.loads(response_text)
+            search_params = self._process_relative_dates(search_params)
+            return search_params
+        except json.JSONDecodeError:
+            # Try to fix common JSON issues
+            fixed_json = self._fix_json(response_text)
+            if fixed_json:
+                search_params = fixed_json
+                search_params = self._process_relative_dates(search_params)
+                return search_params
+        
+        # If not JSON, try to extract structured data from text
+        try:
+            # Check for usage question using the tag format
+            is_usage_question_match = re.search(r'<is_usage_question>(true|false)</is_usage_question>', response_text, re.IGNORECASE)
+            is_usage_question = is_usage_question_match and is_usage_question_match.group(1).lower() == 'true'
+            
+            # Extract explanation
+            explanation_match = re.search(r'<explanation>(.*?)</explanation>', response_text, re.DOTALL | re.IGNORECASE)
+            explanation = explanation_match.group(1).strip() if explanation_match else "I processed your request based on keywords."
+            
+            return {
+                "is_usage_question": is_usage_question,
+                "explanation": explanation
+            }
+        except:
+            # If structured extraction fails too, return None to trigger follow-up request
+            return None
+    
+    def _request_structured_data(self, user_query):
+        """Make a follow-up request to get structured data explicitly"""
+        if not self.ready or self.testing_mode:
+            return self._fallback_extraction(user_query)
+        
+        current_date = datetime.datetime.now().strftime("%Y-%m-%d")
+        follow_up_prompt = f"""
+        I need you to analyze this user query and provide a structured response:
+        
+        Query: "{user_query}"
+        
+        Current date: {current_date}
+        
+        If this is a question about using the software or an unrelated question, respond with:
+        <is_usage_question>true</is_usage_question>
+        <explanation>Your explanation here</explanation>
+        
+        If this is a search query, respond with valid JSON containing:
+        - is_usage_question: false
+        - explanation: brief explanation of how you interpreted the query
+        - title: string or null (if relevant)
+        - author: string or null (if relevant)
+        - tags: string or null (comma-separated, if relevant)
+        - text: string or null (for general text search, if relevant)
+        - date_start: string in YYYY-MM-DD format or null (if relevant)
+        - date_end: string in YYYY-MM-DD format or null (if relevant)
+        - hash_id: string or null (if relevant)
+        
+        IMPORTANT: Make sure your response is easy to parse. If it's a search query, ensure your entire JSON object is valid.
+        """
+        
+        try:
+            # Claude API specific headers
+            headers = {
+                "Content-Type": "application/json",
+                "x-api-key": self.api_key,
+                "anthropic-version": "2023-06-01"
+            }
+            
+            # Claude API payload format
+            payload = {
+                "model": "claude-3-haiku-20240307",
+                "messages": [
+                    {"role": "user", "content": follow_up_prompt}
+                ],
+                "temperature": 0.1,
+                "max_tokens": 500
+            }
+            
+            print("Sending follow-up request for structured data...")
+            response = requests.post(
+                "https://api.anthropic.com/v1/messages",
+                headers=headers,
+                json=payload,
+                timeout=10
+            )
+            
+            if response.status_code != 200:
+                print(f"Follow-up API error: {response.status_code}, {response.text}")
+                return self._fallback_extraction(user_query)
+            
+            result = response.json()
+            
+            # Extract content from Claude response format
+            if "content" in result and len(result["content"]) > 0:
+                response_text = ""
+                for content_block in result["content"]:
+                    if content_block["type"] == "text":
+                        response_text += content_block["text"]
+                
+                # Process the response - first try JSON
+                try:
+                    json_match = re.search(r'\{.*\}', response_text, re.DOTALL)
+                    if json_match:
+                        json_str = json_match.group(0)
+                        search_params = json.loads(json_str)
+                        search_params = self._process_relative_dates(search_params)
+                        return search_params
+                except:
+                    pass
+                
+                # Then try tag format
+                try:
+                    is_usage_question_match = re.search(r'<is_usage_question>(true|false)</is_usage_question>', response_text, re.IGNORECASE)
+                    explanation_match = re.search(r'<explanation>(.*?)</explanation>', response_text, re.DOTALL | re.IGNORECASE)
+                    
+                    if is_usage_question_match and explanation_match:
+                        is_usage_question = is_usage_question_match.group(1).lower() == 'true'
+                        explanation = explanation_match.group(1).strip()
+                        
+                        return {
+                            "is_usage_question": is_usage_question,
+                            "explanation": explanation
+                        }
+                except:
+                    pass
+            
+            # If all else fails, fall back to keyword extraction
+            return self._fallback_extraction(user_query)
+        
+        except Exception as e:
+            print(f"Error in follow-up request: {str(e)}")
+            return self._fallback_extraction(user_query)
     
     def _fallback_extraction(self, user_query):
         """Simple fallback keyword extraction when LLM is unavailable"""
@@ -391,6 +519,9 @@ I can also help you search for entries using natural language queries like *"fin
                 search_params["date_end"] = (today - datetime.timedelta(days=1)).strftime("%Y-%m-%d")
             elif date_end == "today":
                 search_params["date_end"] = today.strftime("%Y-%m-%d")
+
+        
+        return search_params
     
     def _fix_json(self, json_str):
         """Attempt to fix common JSON formatting issues"""
