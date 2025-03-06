@@ -34,7 +34,7 @@ Clone the repository, then run `pip3 install -r requirements.txt` inside the rep
 ### Linux dependencies
 This app is designed for Linux distributions. Install the dependencies using:
 ```console
-Amin@Maximus:./Data-Manager$ bash requirements_linux.sh
+Amin@Maximus:./Data-Manager$ python3 src/main.py -hu localhost:8080
 ```
 
 ## 🚀 Usage
