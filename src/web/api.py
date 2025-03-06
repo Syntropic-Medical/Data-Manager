@@ -1153,17 +1153,40 @@ class WebApp():
                 quantity = flask.request.form.get('quantity')
                 note = flask.request.form.get('note')
                 order_assignee = flask.request.form.get('order_assignee')
-                
-                # Validate inputs
-                if not order_id or not order_name or not quantity or not order_assignee:
-                    return flask.jsonify({'success': False, 'message': 'Missing required parameters'})
-                
-                # Convert order_id to integer
+
                 try:
                     order_id = int(order_id)
                     quantity = int(quantity)
                 except ValueError:
                     return flask.jsonify({'success': False, 'message': 'Invalid order ID or quantity'})
+
+                # check of order assignee has changed from the original assignee
+                cursor = self.db_configs.conn.cursor()
+                cursor.execute("SELECT * FROM orders WHERE id=?", (order_id,))
+                order = cursor.fetchone()
+                cursor.execute("PRAGMA table_info(orders)")
+                columns = [column[1] for column in cursor.fetchall()]
+                order_dict = dict(zip(columns, order))
+                
+                if order_dict['order_assignee'] != order_assignee:
+                    
+                    # get email of the new assignee
+                    cursor.execute("SELECT email, email_enabled FROM users WHERE username=?", (order_assignee,))
+                    assignee_email, assignee_email_enabled = cursor.fetchone()
+                    if assignee_email_enabled:
+                        mail_args = {
+                            'receiver_email': assignee_email,
+                            'sender_email': self.app.config['CREDS_FILE']['SENDER_EMAIL_ADDRESS'],
+                            'password': self.app.config['CREDS_FILE']['SENDER_EMAIL_PASSWORD'],
+                            'subject': f'Order assigned to you: {order_name}',
+                        }
+                        mailing.send_new_order_mail(order_dict, mail_args)
+
+
+
+                # Validate inputs
+                if not order_id or not order_name or not quantity or not order_assignee:
+                    return flask.jsonify({'success': False, 'message': 'Missing required parameters'})
                 
                 # Get the order from the database
                 cursor = self.db_configs.conn.cursor()

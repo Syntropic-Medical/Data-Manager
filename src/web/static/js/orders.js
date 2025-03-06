@@ -36,15 +36,13 @@ window.editOrder = function(orderId) {
     // Fetch order details
     $.get('/get_order_details/' + orderId)
         .done(function(response) {
-            // Parse the HTML response to extract order data
-            const tempDiv = document.createElement('div');
-            tempDiv.innerHTML = response;
             
             // Extract data from the parsed HTML
-            const orderName = $(tempDiv).find('.order-name').text().trim();
-            const link = $(tempDiv).find('.order-link a').attr('href') || '';
-            const quantity = $(tempDiv).find('.order-quantity').text().trim();
-            const note = $(tempDiv).find('.order-note').text().trim();
+            const orderName = response.order_name;
+            const link = response.link || '';
+            const quantity = response.quantity;
+            const note = response.note;
+            const orderAssignee = response.order_assignee;
             
             // Populate the edit form
             $('#edit_order_id').val(orderId);
@@ -52,6 +50,7 @@ window.editOrder = function(orderId) {
             $('#edit_link').val(link);
             $('#edit_quantity').val(quantity);
             $('#edit_note').val(note);
+            $('#edit_order_assignee').val(orderAssignee);
         })
         .fail(function() {
             $('#editOrderModal').modal('hide');

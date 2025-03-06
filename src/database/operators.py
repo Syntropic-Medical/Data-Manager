@@ -16,7 +16,7 @@ def create_connection(db_file):
     conn = None
     try:
         conn = sqlite3.connect(db_file, check_same_thread=False)
-        print('Connected to database using SQLite', sqlite3.version)
+        print('Connected to database using SQLite')
     except Error as e:
         print(e)
     return conn
