@@ -1,7 +1,7 @@
 <div align="center">
 <br/>
-<h1>NeuroDUI</h1>
-<h3>Neuro Data User Interface</h3>
+<h1>Data Manager</h1>
+<h3>A Complete Data Organization Solution</h3>
 <br/>
 <img src="https://img.shields.io/badge/Python-14354C?style=for-the-badge&logo=python&logoColor=white" alt="built with Python3" />
 <img src="https://img.shields.io/badge/sqlite-%2307405e.svg?style=for-the-badge&logo=sqlite&logoColor=white" alt="built with SQLite" />
@@ -9,75 +9,51 @@
 <img src="https://img.shields.io/badge/css3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white" alt="built with CSS" />
 <img src="https://img.shields.io/badge/shell_script-%23121011.svg?style=for-the-badge&logo=gnu-bash&logoColor=white" alt="built with Shell Script" />
 
-
 </div>
 
+## 🚀 Unleash Your Data's Potential
 
+Data Manager is a powerful, intuitive platform designed to simplify how you organize, search, and interact with your data. Say goodbye to chaotic file systems and hello to streamlined data management!
 
+### ✨ Key Features
 
+- **Smart Search** - Find exactly what you need with an intelligent natural language search assistant
+- **Secure Access** - Robust authentication system keeps your data protected
+- **Intuitive Interface** - Navigate your data with ease through a clean, user-friendly design
+- **Cross-Platform** - Works seamlessly across different operating systems
+- **Customizable** - Tailor the experience to fit your specific workflow needs
 
-## Installation
+## 🔧 Installation
 
 ### Source code
-First clone the repository, then run `pip3 install -r requirements.txt` inside of the repository folder.
+Clone the repository, then run `pip3 install -r requirements.txt` inside the repository folder.
 
 ### PyPI
 \<to be added\>
 
 ### Linux dependencies
-This app is designed for linux distributions. You can install the dependecises for linux using the following command:
+This app is designed for Linux distributions. Install the dependencies using:
 ```console
 Amin@Maximus:./Data-Manager$ bash requirements_linux.sh
-
 ```
 
-## Usage
-Please take a look at [here](https://github.com/AminAlam/Data-Manager/wiki) for documentations.
+## 🚀 Usage
+Check out the [documentation](https://github.com/AminAlam/Data-Manager/wiki) for detailed guides.
 
-After installing the dependencies, you can run the program via following command:
+Launch the program with:
 ```console
 Amin@Maximus:./Data-Manager$ python3 src/main.py --server_ip localhost --port 8080
-
 ```
-You can access the app via the following url http://localhost:8080. It is also possible to run the program on a different PORT (Please make sure that PORT is open in your firewall settings). 
+Access the app at http://localhost:8080. You can also run it on a different port (ensure the port is open in your firewall settings).
 The default username and password are *admin* and *admin* (You can change this password in the <em>profile</em> tab).
 
-## Documentation
+## 📚 Documentation
 
-Please take a look at [here](https://github.com/AminAlam/Data-Manager/wiki) for the full documentation.
-
-# LLM-Powered Search Assistant
-
-This application includes a natural language search assistant powered by Llama.
-
-## Model Setup Instructions
-
-1. Create a `models` directory in the root of your project:
-   ```
-   mkdir -p models
-   ```
-
-2. Download a GGUF format Llama model. You can get models from Hugging Face:
-   - For a smaller model: [Llama-2-7B-Chat-GGUF](https://huggingface.co/TheBloke/Llama-2-7B-Chat-GGUF)
-   - For better quality: [Llama-2-13B-Chat-GGUF](https://huggingface.co/TheBloke/Llama-2-13B-Chat-GGUF)
-
-3. Download the appropriate quantized version based on your hardware capabilities:
-   - For limited RAM: Use the Q4_K_M or Q4_0 versions
-   - For more RAM: Use Q5_K_M or Q8_0 for better quality
-
-4. Place the downloaded model in the `models` directory and update the model path in `src/web/api.py`:
-   ```python
-   self.llm_search = LlamaSearch(
-       model_path="models/your-model-filename.gguf",
-       n_threads=num_threads
-   )
-   ```
-
-5. Restart your application and the search assistant will be ready to use!
+For comprehensive documentation, visit the [wiki](https://github.com/AminAlam/Data-Manager/wiki).
 
 ## Environment Variables
 
-The application now uses environment variables for configuration instead of the previous `creds.json` file. To set up your environment:
+The application uses environment variables for configuration. To set up your environment:
 
 1. Copy the `.env.example` file to `.env`:
    ```bash
