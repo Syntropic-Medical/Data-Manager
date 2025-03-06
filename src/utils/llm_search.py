@@ -44,42 +44,34 @@ class ExternalLLMSearch:
         3. Explaining software functionality based on the current interface
 
         You should:
-        - Only answer questions related to using the software or searching entries or related to entries
+        - Only answer questions related to using the software or searching entries
         - Politely decline to answer personal questions or topics unrelated to the software
         - Keep responses focused on practical software usage
         - Be friendly but professional
         - Never mention or discuss source code or technical implementation details
-        - When asked about how to use specific parts of the software, provide instructions based on the user interface elements
         - Never reference HTML, code, or implementation details in your responses
-        - Use Markdown formatting in your responses for better readability (bold, italics, lists, etc.)
-        - Use **bold** for important terms, headings, and UI elements
-        - Use *italics* for emphasis
-        - Use proper line breaks and paragraphs for clarity
-        - Use numbered lists for sequential instructions
-        - Use bullet points for non-sequential items
 
-        For search queries, extract these parameters (only include relevant fields):
-        - title: String to search in entry titles
-        - author: Author name to filter by
-        - tags: Tags to search for (comma-separated)
-        - text: Text to search within entries
-        - date_start: Start date in YYYY-MM-DD format
-        - date_end: End date in YYYY-MM-DD format
-        - hash_id: Hash ID to search for
-        - explanation: A brief explanation of how you interpreted the query
+        For search queries about entries in the database, extract these elements:
+        - <keywords>List of important keywords from the query, comma-separated</keywords>
+        - <date_start>Start date in YYYY-MM-DD format (if mentioned)</date_start>
+        - <date_end>End date in YYYY-MM-DD format (if mentioned)</date_end>
 
         Here is the user's query:
         "{user_query}"
 
-
         Here is the current date:
         "{current_date}"
 
-        If this is a search query, respond with a valid JSON object containing the search parameters and include a field called 'is_usage_question' with a value of false.
-        
         If this is a question about using the software or an unrelated question, format your response like this:
         <is_usage_question>true</is_usage_question>
         <explanation>Your helpful explanation focused on user interface and functionality, or an explanation of why you can't help with the question.</explanation>
+
+        If this is a search query about entries, respond with:
+        <is_usage_question>false</is_usage_question>
+        <keywords>keyword1, keyword2, keyword3, ...</keywords>
+        <date_start>YYYY-MM-DD</date_start> (only if date or time is mentioned)
+        <date_end>YYYY-MM-DD</date_end> (only if date or time is mentioned)
+        <explanation>Brief explanation of how you interpreted the search</explanation>
 
         NEVER EVER introduce yourself at the beginning of your response.
         """
@@ -181,36 +173,36 @@ class ExternalLLMSearch:
     
     def _process_llm_response(self, response_text):
         """Process the LLM response and extract structured data"""
-        # First, try to parse as JSON
-        try:
-            search_params = json.loads(response_text)
-            search_params = self._process_relative_dates(search_params)
-            return search_params
-        except json.JSONDecodeError:
-            # Try to fix common JSON issues
-            fixed_json = self._fix_json(response_text)
-            if fixed_json:
-                search_params = fixed_json
-                search_params = self._process_relative_dates(search_params)
-                return search_params
+        search_params = {}
         
-        # If not JSON, try to extract structured data from text
-        try:
-            # Check for usage question using the tag format
-            is_usage_question_match = re.search(r'<is_usage_question>(true|false)</is_usage_question>', response_text, re.IGNORECASE)
-            is_usage_question = is_usage_question_match and is_usage_question_match.group(1).lower() == 'true'
+        # Check for usage question using the tag format
+        is_usage_question_match = re.search(r'<is_usage_question>(true|false)</is_usage_question>', response_text, re.IGNORECASE)
+        is_usage_question = is_usage_question_match and is_usage_question_match.group(1).lower() == 'true'
+        search_params["is_usage_question"] = is_usage_question
+        
+        # Extract explanation
+        explanation_match = re.search(r'<explanation>(.*?)</explanation>', response_text, re.DOTALL | re.IGNORECASE)
+        search_params["explanation"] = explanation_match.group(1).strip() if explanation_match else "I processed your request based on keywords."
+        
+        if not is_usage_question:
+            # Extract keywords
+            keywords_match = re.search(r'<keywords>(.*?)</keywords>', response_text, re.DOTALL | re.IGNORECASE)
+            if keywords_match:
+                search_params["text"] = keywords_match.group(1).strip()
             
-            # Extract explanation
-            explanation_match = re.search(r'<explanation>(.*?)</explanation>', response_text, re.DOTALL | re.IGNORECASE)
-            explanation = explanation_match.group(1).strip() if explanation_match else "I processed your request based on keywords."
+            # Extract dates
+            date_start_match = re.search(r'<date_start>(.*?)</date_start>', response_text, re.IGNORECASE)
+            if date_start_match:
+                search_params["date_start"] = date_start_match.group(1).strip()
+                
+            date_end_match = re.search(r'<date_end>(.*?)</date_end>', response_text, re.IGNORECASE)
+            if date_end_match:
+                search_params["date_end"] = date_end_match.group(1).strip()
             
-            return {
-                "is_usage_question": is_usage_question,
-                "explanation": explanation
-            }
-        except:
-            # If structured extraction fails too, return None to trigger follow-up request
-            return None
+            # Process any relative dates if present
+            search_params = self._process_relative_dates(search_params)
+        
+        return search_params
     
     def _request_structured_data(self, user_query):
         """Make a follow-up request to get structured data explicitly"""
@@ -229,18 +221,14 @@ class ExternalLLMSearch:
         <is_usage_question>true</is_usage_question>
         <explanation>Your explanation here</explanation>
         
-        If this is a search query, respond with valid JSON containing:
-        - is_usage_question: false
-        - explanation: brief explanation of how you interpreted the query
-        - title: string or null (if relevant)
-        - author: string or null (if relevant)
-        - tags: string or null (comma-separated, if relevant)
-        - text: string or null (for general text search, if relevant)
-        - date_start: string in YYYY-MM-DD format or null (if relevant)
-        - date_end: string in YYYY-MM-DD format or null (if relevant)
-        - hash_id: string or null (if relevant)
+        If this is a search query about entries in the database, respond with:
+        <is_usage_question>false</is_usage_question>
+        <keywords>Extract important keywords from the query, comma-separated</keywords>
+        <date_start>YYYY-MM-DD format if mentioned</date_start> (only include if a start date is relevant)
+        <date_end>YYYY-MM-DD format if mentioned</date_end> (only include if an end date is relevant)
+        <explanation>Brief explanation of how you interpreted the search</explanation>
         
-        IMPORTANT: Make sure your response is easy to parse. If it's a search query, ensure your entire JSON object is valid.
+        IMPORTANT: Make sure your response is easy to parse with the XML-like tags shown above.
         """
         
         try:
@@ -547,56 +535,28 @@ def execute_llm_search(conn, search_params):
     params = []
     conditions_added = False
     
-    # Handle hash_id search (exact match)
-    if search_params.get("hash_id"):
-        sql_command += 'id_hash LIKE ? AND '
-        params.append(f'%{search_params["hash_id"]}%')
-        conditions_added = True
-    
-    # Handle author search (case-insensitive partial match)
-    if search_params.get("author"):
-        sql_command += 'LOWER(author) LIKE LOWER(?) AND '
-        params.append(f'%{search_params["author"]}%')
-        conditions_added = True
-    
-    # Group searches for the same term across multiple fields
-    search_terms = set()
-    if search_params.get("title"):
-        # Split title into individual words for better matching
-        search_terms.update(term.strip() for term in search_params["title"].split())
+    # Handle text search across all relevant fields
     if search_params.get("text"):
-        search_terms.update(term.strip() for term in search_params["text"].split())
-    if search_params.get("tags"):
-        search_terms.update(tag.strip() for tag in search_params["tags"].split(','))
-    
-    # Add each search term with OR conditions across multiple fields
-    for term in search_terms:
-        if term and len(term) >= 3:  # Only search terms with 3 or more characters
-            sql_command += '('
-            # Try different variations of the term
-            variations = [
-                f'%{term}%',           # Basic contains
-                f'%_{term}%',          # Part of underscore-separated word
-                f'%{term}_%',          # Part of underscore-separated word
-                f'%{term.lower()}%',   # Lowercase version
-                f'%{term.upper()}%',   # Uppercase version
-                f'%{term.title()}%'    # Title case version
-            ]
-            
-            # Build the OR conditions for each field
-            field_conditions = []
-            for field in ['entry_name', 'extra_txt', 'tags', 'conditions']:
-                for variation in variations:
+        # Split the text into individual keywords
+        keywords = [kw.strip() for kw in search_params["text"].split(',')]
+        for keyword in keywords:
+            if keyword and len(keyword) >= 3:  # Only search keywords with 3+ chars
+                sql_command += '('
+                # Search across all relevant fields
+                field_conditions = []
+                for field in ['entry_name', 'author', 'tags', 'conditions', 'extra_txt', 'id_hash']:
                     field_conditions.append(f'{field} LIKE ?')
-                    params.append(variation)
-            
-            sql_command += ' OR '.join(field_conditions)
-            sql_command += ') AND '
-            conditions_added = True
+                    params.append(f'%{keyword}%')
+                
+                sql_command += ' OR '.join(field_conditions)
+                sql_command += ') OR '
+                conditions_added = True
+
+        sql_command = sql_command[:-4]
     
     # Handle date range
     if search_params.get("date_start"):
-        sql_command += 'date >= ? AND '
+        sql_command += ' AND date >= ? AND '
         params.append(search_params["date_start"])
         conditions_added = True
     
@@ -611,6 +571,9 @@ def execute_llm_search(conn, search_params):
     elif not conditions_added:
         sql_command += '1=1'
     
+    # Add ordering by date
+    sql_command += ' ORDER BY date DESC'
+    
     # Debug logging
     print("\nSearch parameters:", search_params)
     print("\nGenerated SQL:", sql_command)
@@ -621,7 +584,6 @@ def execute_llm_search(conn, search_params):
     cursor.execute(sql_command, tuple(params))
     entries_list = cursor.fetchall()
     
-    # Debug logging
     print(f"\nFound {len(entries_list)} results")
     if entries_list:
         print("First result entry_name:", entries_list[0][7])  # Assuming entry_name is at index 7
