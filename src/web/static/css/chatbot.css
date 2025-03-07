@@ -58,6 +58,23 @@
   font-weight: 500;
 }
 
+.chat-header-buttons {
+  display: flex;
+  gap: 5px;
+}
+
+.chat-header button {
+  background: transparent;
+  border: none;
+  color: #6c757d;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.chat-header button:hover {
+  color: #343a40;
+}
+
 .chat-messages {
   flex: 1;
   overflow-y: auto;
@@ -219,13 +236,13 @@
   width: 100%;
 }
 
-.suggested-queries p {
+.suggestions-title {
   margin-bottom: 5px;
   font-size: 0.9em;
   color: #666;
 }
 
-.suggested-query-btn {
+.suggestion-btn {
   background-color: #f1f1f1;
   border: none;
   border-radius: 15px;
@@ -237,7 +254,7 @@
   transition: all 0.2s ease;
 }
 
-.suggested-query-btn:hover {
+.suggestion-btn:hover {
   background-color: #e0e0e0;
 }
 

@@ -68,7 +68,7 @@ class ExternalLLMSearch:
 
         If this is a search query about entries, respond with:
         <is_usage_question>false</is_usage_question>
-        <keywords>keyword1, keyword2, keyword3, ...</keywords>
+        <keywords>keyword1, keyword2, keyword3, ...</keywords> (do not mentoin anything related to date or  the 'entry' keyword itself here)
         <date_start>YYYY-MM-DD</date_start> (only if date or time is mentioned)
         <date_end>YYYY-MM-DD</date_end> (only if date or time is mentioned)
         <explanation>Brief explanation of how you interpreted the search</explanation>

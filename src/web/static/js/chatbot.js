@@ -12,11 +12,13 @@ document.addEventListener('DOMContentLoaded', function() {
     chatInput: document.getElementById('chatInput'),
     chatSendBtn: document.getElementById('chatSendBtn'),
     chatMessages: document.getElementById('chatMessages'),
-    modelStatus: document.getElementById('modelStatus')
+    modelStatus: document.getElementById('modelStatus'),
+    clearChatBtn: document.getElementById('clearChatBtn')
   };
   
   // State
   let isModelReady = false;
+  let chatHistory = [];
   
   // Wait for a longer time to ensure all dependencies are loaded
   setTimeout(function() {
@@ -29,14 +31,20 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add event listeners
     setupEventListeners();
     
-    // Add welcome message with a small delay to ensure libraries are loaded
-    setTimeout(() => {
-      // Add welcome message
-      addWelcomeMessage();
-      
-      // Add suggested queries
-      addSuggestedQueries();
-    }, 100);
+    // Load chat history from localStorage
+    loadChatHistory();
+    
+    // If no chat history, add welcome message
+    if (chatHistory.length === 0) {
+      // Add welcome message with a small delay to ensure libraries are loaded
+      setTimeout(() => {
+        // Add welcome message
+        addWelcomeMessage();
+        
+        // Add suggested queries
+        addSuggestedQueries();
+      }, 100);
+    }
   }
   
   // Setup event listeners
@@ -54,6 +62,13 @@ document.addEventListener('DOMContentLoaded', function() {
     elements.chatToggleBtn.addEventListener('click', function() {
       elements.chatContainer.style.display = 'none';
       elements.chatLaunchBtn.style.display = 'flex';
+    });
+    
+    // Clear chat history
+    elements.clearChatBtn.addEventListener('click', function() {
+      if (confirm('Are you sure you want to clear the chat history?')) {
+        clearChatHistory();
+      }
     });
     
     // Send message on button click
@@ -214,6 +229,10 @@ How can I assist you today?`;
     
     elements.chatMessages.appendChild(messageDiv);
     elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight;
+    
+    // Save message to chat history
+    chatHistory.push({ text, type });
+    saveChatHistory();
   }
   
   // Display search results
@@ -247,47 +266,154 @@ How can I assist you today?`;
       
       const metaDiv = document.createElement('div');
       metaDiv.classList.add('search-result-meta');
-      
-      // Format the date
-      let dateStr = entry.author;
-      try {
-        const entryDate = new Date(entry.author);
-        dateStr = entryDate.toLocaleDateString();
-      } catch (e) {
-        // Use the original date string if parsing fails
-      }
-      
-      metaDiv.textContent = `By ${entry.date} on ${dateStr} | Tags: ${entry.tags || 'None'}`;
+      metaDiv.textContent = `${entry.author} • ${entry.date}`;
       
       entryDiv.appendChild(titleDiv);
       entryDiv.appendChild(metaDiv);
+      
       resultsDiv.appendChild(entryDiv);
     });
     
     elements.chatMessages.appendChild(resultsDiv);
     elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight;
+    
+    // Save search results to chat history
+    chatHistory.push({ 
+      type: 'search-results', 
+      entries: entries.map(entry => ({
+        id: entry.id,
+        title: entry.title || 'Untitled Entry',
+        author: entry.author,
+        date: entry.date
+      }))
+    });
+    saveChatHistory();
   }
   
-  // Function to add suggested queries
+  // Add suggested queries
   function addSuggestedQueries() {
-    const suggestedQueriesDiv = document.createElement('div');
-    suggestedQueriesDiv.className = 'suggested-queries';
-    suggestedQueriesDiv.innerHTML = `
-      <p>Try asking me:</p>
-      <button class="suggested-query-btn" data-query="How do I add a new entry?">How do I add a new entry?</button>
-      <button class="suggested-query-btn" data-query="Show me how to search for entries">Show me how to search for entries</button>
-      <button class="suggested-query-btn" data-query="Find entries from last week">Find entries from last week</button>
-    `;
+    const suggestedQueries = [
+      "Find my recent entries",
+      "How do I create a new entry?",
+      "Show all entries from last month"
+    ];
     
-    elements.chatMessages.appendChild(suggestedQueriesDiv);
+    const suggestionsDiv = document.createElement('div');
+    suggestionsDiv.className = 'suggested-queries';
     
-    // Add event listeners for suggested query buttons
-    suggestedQueriesDiv.querySelectorAll('.suggested-query-btn').forEach(button => {
-      button.addEventListener('click', function() {
-        const query = this.getAttribute('data-query');
+    const suggestionsTitle = document.createElement('div');
+    suggestionsTitle.className = 'suggestions-title';
+    suggestionsTitle.textContent = 'Try asking:';
+    suggestionsDiv.appendChild(suggestionsTitle);
+    
+    suggestedQueries.forEach(query => {
+      const queryButton = document.createElement('button');
+      queryButton.className = 'suggestion-btn';
+      queryButton.textContent = query;
+      queryButton.addEventListener('click', function() {
         elements.chatInput.value = query;
         sendMessage();
       });
+      suggestionsDiv.appendChild(queryButton);
     });
+    
+    elements.chatMessages.appendChild(suggestionsDiv);
+    
+    // Save suggested queries to chat history
+    chatHistory.push({ type: 'suggested-queries', queries: suggestedQueries });
+    saveChatHistory();
   }
+  
+  // Save chat history to localStorage
+  function saveChatHistory() {
+    try {
+      localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+    } catch (error) {
+      console.error('Error saving chat history to localStorage:', error);
+    }
+  }
+  
+  // Load chat history from localStorage
+  function loadChatHistory() {
+    try {
+      const savedHistory = localStorage.getItem('chatHistory');
+      if (savedHistory) {
+        chatHistory = JSON.parse(savedHistory);
+        
+        // Render chat history
+        chatHistory.forEach(item => {
+          if (item.type === 'user' || item.type === 'system') {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', item.type);
+            
+            if (item.type === 'system') {
+              try {
+                const parsedHtml = marked.parse(item.text);
+                const sanitizedHtml = DOMPurify.sanitize(parsedHtml);
+                messageDiv.innerHTML = sanitizedHtml;
+              } catch (error) {
+                messageDiv.textContent = item.text;
+              }
+            } else {
+              messageDiv.textContent = item.text;
+            }
+            
+            elements.chatMessages.appendChild(messageDiv);
+          } else if (item.type === 'search-results' && item.entries) {
+            displaySearchResults(item.entries);
+          } else if (item.type === 'suggested-queries' && item.queries) {
+            // Recreate suggested queries
+            const suggestionsDiv = document.createElement('div');
+            suggestionsDiv.className = 'suggested-queries';
+            
+            const suggestionsTitle = document.createElement('div');
+            suggestionsTitle.className = 'suggestions-title';
+            suggestionsTitle.textContent = 'Try asking:';
+            suggestionsDiv.appendChild(suggestionsTitle);
+            
+            item.queries.forEach(query => {
+              const queryButton = document.createElement('button');
+              queryButton.className = 'suggestion-btn';
+              queryButton.textContent = query;
+              queryButton.addEventListener('click', function() {
+                elements.chatInput.value = query;
+                sendMessage();
+              });
+              suggestionsDiv.appendChild(queryButton);
+            });
+            
+            elements.chatMessages.appendChild(suggestionsDiv);
+          }
+        });
+        
+        // Scroll to bottom
+        elements.chatMessages.scrollTop = elements.chatMessages.scrollHeight;
+      }
+    } catch (error) {
+      console.error('Error loading chat history from localStorage:', error);
+      chatHistory = [];
+    }
+  }
+  
+  // Clear chat history
+  function clearChatHistory() {
+    // Clear chat history array
+    chatHistory = [];
+    
+    // Clear localStorage
+    localStorage.removeItem('chatHistory');
+    
+    // Clear chat messages UI
+    elements.chatMessages.innerHTML = '';
+    
+    // Add model status element back
+    elements.chatMessages.appendChild(elements.modelStatus);
+    
+    // Add welcome message and suggested queries
+    addWelcomeMessage();
+    addSuggestedQueries();
+  }
+  
+  // Add clear chat history button to global scope
+  window.clearChatHistory = clearChatHistory;
 }); 

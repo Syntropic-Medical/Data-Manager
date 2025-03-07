@@ -405,10 +405,6 @@ def load_creds(CREDS_FILE_PATH=None):
     
     return creds
 
-def set_parent_entry(conn, entry_id, parent_hash_id):
-    cursor = conn.cursor()
-    cursor.execute('update entries set entry_parent=? where id=?', (parent_hash_id, entry_id))
-    conn.commit()
 
 def get_family_tree(conn, entry_hash_id):
     family_tree = {'parent': None, 'children': None, 'self': None}
@@ -546,14 +542,6 @@ def get_methods_list(app_config):
     methods_list.insert(0, app_config['CONDITIONS_JSON_DEFAULT'].split('.')[0])
     return methods_list
 
-
-def get_email_address_by_user_name(conn, user_name):
-    cursor = conn.cursor()
-    cursor.execute('SELECT email, email_enabled FROM users WHERE username=?', (user_name,))
-    user = cursor.fetchone()
-    if not user or not user[1]:  # If user doesn't exist or email is disabled
-        return None
-    return user[0]
 
 def check_emails_validity(emails: Union[list, tuple]) -> bool:
     """Check if all emails in a list are valid.

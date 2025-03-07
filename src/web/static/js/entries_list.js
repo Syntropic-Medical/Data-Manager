@@ -126,110 +126,13 @@ function applyTableStyling() {
 
 // Function to initialize table sorting
 function initializeTableSorting() {
-  const sortableTables = document.querySelectorAll('table.table-sortable');
-  
-  sortableTables.forEach(table => {
-    const thead = table.querySelector('thead');
-    if (!thead) return;
-    
-    const headers = thead.querySelectorAll('th');
-    
-    // Add click event listeners to all headers
-    headers.forEach((header, index) => {
-      // Skip the checkbox column (usually the first column)
-      if (header.querySelector('input[type="checkbox"]')) return;
-      
-      // Add sort indicators and styling if not already added
-      if (!header.classList.contains('sortable')) {
-        header.classList.add('sortable');
-        header.style.cursor = 'pointer';
-        
-        // Create sort indicator element
-        const sortIndicator = document.createElement('span');
-        sortIndicator.className = 'sort-indicator ms-1';
-        sortIndicator.innerHTML = '⇕';
-        header.appendChild(sortIndicator);
-        
-        // Add click event to header
-        header.addEventListener('click', function() {
-          sortTable(table, index, this);
-        });
-      }
-    });
-  });
-}
-
-// Function to sort table
-function sortTable(table, columnIndex, headerElement) {
-  const tbody = table.querySelector('tbody');
-  const rows = Array.from(tbody.querySelectorAll('tr'));
-  const isAscending = headerElement.getAttribute('data-sort') !== 'asc';
-  
-  // Reset all headers
-  table.querySelectorAll('th').forEach(th => {
-    if (th.querySelector('.sort-indicator')) {
-      th.querySelector('.sort-indicator').innerHTML = '⇕';
-    }
-    th.removeAttribute('data-sort');
-  });
-  
-  // Set current header sort direction
-  headerElement.setAttribute('data-sort', isAscending ? 'asc' : 'desc');
-  headerElement.querySelector('.sort-indicator').innerHTML = isAscending ? '↑' : '↓';
-  
-  // Sort the rows
-  rows.sort((rowA, rowB) => {
-    const cellA = rowA.querySelectorAll('td')[columnIndex];
-    const cellB = rowB.querySelectorAll('td')[columnIndex];
-    
-    if (!cellA || !cellB) return 0;
-    
-    let valueA = cellA.textContent.trim();
-    let valueB = cellB.textContent.trim();
-    
-    // Check if the column contains dates
-    if (isDateString(valueA) && isDateString(valueB)) {
-      return compareDates(valueA, valueB, isAscending);
-    }
-    
-    // Check if the column contains numbers
-    if (!isNaN(valueA) && !isNaN(valueB)) {
-      return compareNumbers(valueA, valueB, isAscending);
-    }
-    
-    // Default to string comparison
-    return compareStrings(valueA, valueB, isAscending);
-  });
-  
-  // Reorder the rows in the table
-  rows.forEach(row => tbody.appendChild(row));
-}
-
-// Helper function to check if a string is a date
-function isDateString(str) {
-  // Check common date formats (YYYY-MM-DD, MM/DD/YYYY, etc.)
-  return /^\d{4}-\d{2}-\d{2}$/.test(str) || 
-         /^\d{1,2}\/\d{1,2}\/\d{4}$/.test(str) ||
-         /^\d{1,2}-\d{1,2}-\d{4}$/.test(str);
-}
-
-// Helper function to compare dates
-function compareDates(dateA, dateB, isAscending) {
-  const a = new Date(dateA);
-  const b = new Date(dateB);
-  return isAscending ? a - b : b - a;
-}
-
-// Helper function to compare numbers
-function compareNumbers(a, b, isAscending) {
-  return isAscending ? a - b : b - a;
-}
-
-// Helper function to compare strings
-function compareStrings(a, b, isAscending) {
-  return isAscending ? 
-    a.localeCompare(b) : 
-    b.localeCompare(a);
+  // Instead of redefining the sorting functionality,
+  // use the global function provided by table_sorting.js
+  if (typeof window.initTableSorting === 'function') {
+    window.initTableSorting();
+  } else {
+    console.warn('Table sorting function not available. Make sure table_sorting.js is loaded.');
+  }
 }
 
 // Initialize event listeners when DOM is loaded
@@ -249,21 +152,24 @@ document.addEventListener('DOMContentLoaded', function() {
     applyTableStyling();
     
     // Initialize table sorting for any existing tables
-    initializeTableSorting();
+    // This will be handled by table_sorting.js directly
+    // No need to call it here to avoid double initialization
     
     // Add a mutation observer to apply styling to dynamically added tables
-    const resultsContainer = document.getElementById('resultsContainer');
-    if (resultsContainer) {
-        const observer = new MutationObserver(function(mutations) {
-            applyTableStyling();
-        });
-        
-        observer.observe(resultsContainer, { 
-            childList: true,
-            subtree: true 
-        });
-    }
-}); 
+    const observer = new MutationObserver(function(mutations) {
+        applyTableStyling();
+        // Let the global MutationObserver in table_sorting.js handle sorting initialization
+    });
+    
+    // Observe the entire document for any changes to tables
+    observer.observe(document.body, { 
+        childList: true,
+        subtree: true 
+    });
+});
+
+// Make sorting functionality available globally for pages that need it
+window.initializeTableSorting = initializeTableSorting;
 
 document.addEventListener('DOMContentLoaded', function() {
     // Date range toggle functionality
@@ -401,8 +307,8 @@ document.addEventListener('DOMContentLoaded', function() {
                   <th scope="col" width="2.5%" class="text-center"><input type="checkbox" id="selectAll" class="form-check-input"></th>
                   <th scope="col" width="35%" class="text-center">Title</th>
                   <th scope="col" width="15%" class="text-center">Hash ID</th>
-                  <th scope="col" width="15%" class="text-center">Date</th>
-                  <th scope="col" width="5%" class="text-center">Author</th>
+                  <th scope="col" width="10%" class="text-center">Date</th>
+                  <th scope="col" width="10%" class="text-center">Author</th>
                   <th scope="col" width="13.75%" class="text-center">Tags</th>
                   <th scope="col" width="13.75%" class="text-center">Conditions</th>
                 </tr>

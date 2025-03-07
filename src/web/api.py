@@ -741,7 +741,7 @@ class WebApp():
                 for user_name in user_names.split(','):
                     user_name = user_name.strip()
                     if user_name:
-                        email = utils.get_email_address_by_user_name(self.db_configs.conn, user_name)
+                        email = operators.get_email_address_by_user_name(self.db_configs.conn, user_name)
                         if email:
                             email_addresses.append(email)
                             user_list.append(user_name)
@@ -791,6 +791,16 @@ class WebApp():
                     flask.flash('Failed to send email notifications')
                 
                 # Add this return statement to fix the error
+                return flask.redirect(flask.url_for('entries'))
+            
+            elif action == "set_parent_entry":
+                parent_entry_hash_id = post_form.get('parent_entry_hash_id')
+                if not operators.check_hash_id_existence(self.db_configs.conn, parent_entry_hash_id):
+                    flask.flash('Parent entry does not exist')
+                    return flask.redirect(flask.url_for('entries'))
+                for id in entries_ids:
+                    operators.set_parent_entry(self.db_configs.conn, id, parent_entry_hash_id)
+                flask.flash('Parent entry set successfully')
                 return flask.redirect(flask.url_for('entries'))
             
             # Default fallback

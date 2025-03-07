@@ -1,16 +1,16 @@
-<form action="{{ url_for('entries_actions')}}" method=post enctype=multipart/form-data>
+<form action="{{ url_for('entries_actions')}}" method=post enctype=multipart/form-data id="actionsForm">
     {% if entries_list is not none %}
         <div class="table-responsive p-3">
             <table class="table table-hover table-bordered table-striped table-sortable">
                 <thead class="table-dark">
                     <tr>
                         <th scope="col" width="2.5%" class="text-center"><input type="checkbox" id="selectAll" class="form-check-input"></th>
-                        <th scope="col" width="35%" class="text-center">Title</th>
-                        <th scope="col" width="15%" class="text-center">Hash ID</th>
-                        <th scope="col" width="15%" class="text-center">Date</th>
-                        <th scope="col" width="5%" class="text-center">Author</th>
-                        <th scope="col" width="13.75%" class="text-center">Tags</th>
-                        <th scope="col" width="13.75%" class="text-center">Conditions</th>
+                        <th scope="col" width="35%" class="text-center">Title <span class="sort-icon"></span></th>
+                        <th scope="col" width="15%" class="text-center">Hash ID <span class="sort-icon"></span></th>
+                        <th scope="col" width="10%" class="text-center">Date <span class="sort-icon"></span></th>
+                        <th scope="col" width="10%" class="text-center">Author <span class="sort-icon"></span></th>
+                        <th scope="col" width="13.75%" class="text-center">Tags <span class="sort-icon"></span></th>
+                        <th scope="col" width="13.75%" class="text-center">Conditions <span class="sort-icon"></span></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -120,7 +120,7 @@
     </div>
     
     <!-- Set Parent Entry Modal -->
-    <div class="modal fade" id="setParentModal" tabindex="-1" aria-labelledby="setParentModalLabel" aria-hidden="true>
+    <div class="modal fade" id="setParentModal" tabindex="-1" aria-labelledby="setParentModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">

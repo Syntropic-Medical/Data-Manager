@@ -777,17 +777,13 @@ def delete_password_reset_token(conn, token):
         utils.error_log(e)
         return False
 
-def get_email_address_by_user_name(conn, username):
-    try:
-        cursor = conn.cursor()
-        cursor.execute('SELECT email FROM users WHERE username=?', (username,))
-        result = cursor.fetchone()
-        if result:
-            return result[0]
+def get_email_address_by_user_name(conn, user_name):
+    cursor = conn.cursor()
+    cursor.execute('SELECT email, email_enabled FROM users WHERE username=?', (user_name,))
+    user = cursor.fetchone()
+    if not user or not user[1]:  # If user doesn't exist or email is disabled
         return None
-    except Error as e:
-        utils.error_log(e)
-        return None
+    return user[0]
 
 def get_column_names(conn, table_name):
     """Get column names for a specified table."""
@@ -796,3 +792,8 @@ def get_column_names(conn, table_name):
     columns = cursor.fetchall()
     column_names = [column[1] for column in columns]  # Column name is the second field
     return column_names
+
+def set_parent_entry(conn, entry_id, parent_hash_id):
+    cursor = conn.cursor()
+    cursor.execute('update entries set entry_parent=? where id=?', (parent_hash_id, entry_id))
+    conn.commit()
