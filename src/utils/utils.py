@@ -16,7 +16,8 @@ import shutil
 import mailing
 import datetime as dt
 import logging
-
+import csv
+import io
 from datetime import datetime, date
 
 from typing import Union
@@ -373,6 +374,41 @@ def entry_report_maker(conn, entry_id):
     </table>
     """
     return report
+
+def bulk_entry_report_maker(conn, entries_ids):
+    # make a csv file with the report for the entries
+    report = []
+    for entry_id in entries_ids:
+        cursor = conn.cursor()
+        cursor.execute('select * from entries where id=?', (entry_id,))
+        entry = cursor.fetchone()
+        column_names = list(map(lambda x: x[0], cursor.description))
+        entry = list(entry)
+        entry[1] = parse_tags(entry[1])
+        entry[6] = parse_conditions(entry[6])
+        for i in range(len(entry[6])):
+            entry[6][i] = entry[6][i].replace('&', '->')
+
+        report.append(entry)
+
+    # Use StringIO instead of BytesIO for working with text
+    report_str = io.StringIO()
+    writer = csv.writer(report_str)
+    
+    # Write column names
+    writer.writerow(column_names)
+    
+    # Write all row data
+    for row in report:
+        writer.writerow(row)
+    
+    # Convert to bytes when done
+    report_bytes = io.BytesIO()
+    report_bytes.write(report_str.getvalue().encode('utf-8'))
+    report_bytes.seek(0)
+    return report_bytes
+            
+    
 
 def check_hash_id_existence(conn, hash_id):
     cursor = conn.cursor()

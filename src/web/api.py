@@ -177,7 +177,6 @@ class WebApp():
             # Convert entries from tuples to dictionaries with named keys
             entries_dict_list = []
             for entry in entries_list:
-                print(entry)
                 entries_dict_list.append({
                     'hash_id': entry[0],
                     'tags': entry[1],
@@ -693,17 +692,12 @@ class WebApp():
         @security.login_required
         @self.logger
         def entry_report_maker(id):
-            cwd = os.getcwd()
-            cwd = os.path.join(cwd, app.config['DATABASE_FOLDER'], 'reports')
-            entry_report = utils.entry_report_maker(self.db_configs.conn, id)
-            file_path = os.path.join(cwd, f'report_{id}.txt')
-            with open(file_path, 'w') as f:
-                f.write(entry_report)
-            return flask.send_from_directory(cwd,  f'report_{id}.txt',as_attachment=True)
+                report_bytes = utils.bulk_entry_report_maker(self.db_configs.conn, [id])
+                return flask.send_file(report_bytes, as_attachment=True, download_name='entry_report.csv')
 
         @app.route('/entries_actions', methods=['POST'])
         @security.login_required
-        @self.logger
+        # @self.logger
         def entries_actions():
             post_form = flask.request.form
             action = post_form.get('action')
@@ -724,6 +718,11 @@ class WebApp():
                     utils.delete_entry(self.db_configs.conn, id)
                 flask.flash(f'Deleted {len(entries_ids)} entries')
                 return flask.redirect(flask.url_for('entries'))
+            if action == 'bulk_report':
+                # Process bulk report action
+                report_bytes = utils.bulk_entry_report_maker(self.db_configs.conn, entries_ids)
+                return flask.send_file(report_bytes, as_attachment=True, download_name='bulk_entry_report.csv')
+                    
             
             elif action == "notify_by_email":
                 if not self.mailing_bool:

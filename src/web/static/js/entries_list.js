@@ -42,6 +42,39 @@ function submitForm(action) {
     } else {
         // We're in the results table, use the form in the results container
         const resultsForm = document.querySelector('#resultsContainer form');
+        
+        if (!resultsForm) {
+            // As a fallback, try using the main actionsForm
+            const actionInput = document.getElementById('action_input');
+            const form = document.getElementById('actionsForm');
+            
+            if (actionInput && form) {
+                // Transfer checkbox selections to the actions form
+                const checkedBoxes = document.querySelectorAll('.entry-checkbox:checked');
+                
+                // Clear previous selections
+                const existingInputs = form.querySelectorAll('input[name^="Select&"]');
+                existingInputs.forEach(input => input.remove());
+                
+                // Add current selections
+                checkedBoxes.forEach(checkbox => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = checkbox.id;
+                    input.value = 'on';
+                    form.appendChild(input);
+                });
+                
+                // Set action and submit
+                actionInput.value = action;
+                form.submit();
+                return;
+            }
+            
+            console.error('Neither results form nor actions form could be found');
+            return;
+        }
+        
         const actionInput = document.getElementById('results_action_input');
         
         if (resultsForm && actionInput) {
