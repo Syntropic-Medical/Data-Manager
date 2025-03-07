@@ -1058,7 +1058,7 @@ class WebApp():
 
         @app.route('/update_order_status', methods=['POST'])
         @security.login_required
-        @self.logger
+        # @self.logger
         def update_order_status():
             # try:
                 # Get data from request
@@ -1084,24 +1084,27 @@ class WebApp():
                 cursor = self.db_configs.conn.cursor()
                 cursor.execute("SELECT * FROM orders WHERE id=?", (order_id,))
                 order = cursor.fetchone()
-                columns = [column[1] for column in cursor.fetchall()]
-                order_data = dict(zip(columns, order))
-
                 if not order:
                     return flask.jsonify({'success': False, 'message': 'Order not found'})
-                
+
                 # Convert to dict with column names
                 cursor.execute("PRAGMA table_info(orders)")
                 columns = [column[1] for column in cursor.fetchall()]
                 order_dict = dict(zip(columns, order))
-                
+
                 # Check if user is authorized to update this order
                 if not (flask.session['admin'] or flask.session['username'] == order_dict['order_author']):
                     return flask.jsonify({'success': False, 'message': 'Unauthorized'})
-                
+
                 # Update the order in the database
                 cursor.execute("UPDATE orders SET status=? WHERE id=?", (new_status, order_id))
                 self.db_configs.conn.commit()
+
+                # get the updated order
+                cursor.execute("SELECT * FROM orders WHERE id=?", (order_id,))
+                order = cursor.fetchone()
+                column_names = operators.get_column_names(self.db_configs.conn, 'orders')
+                order_dict = dict(zip(column_names, order))
 
                 # Send email notification to order assignee
                 if self.mailing_bool:
@@ -1115,7 +1118,7 @@ class WebApp():
                             'subject': f'Order Status Updated: {order_dict["order_name"]}',
                         }
                         mailing.send_order_status_mail(order_dict, mail_args)
-                
+
                 # Add notification
                 operators.add_notification(
                     self.db_configs.conn,
@@ -1126,12 +1129,8 @@ class WebApp():
                     order_id
                 )
 
-                # Return success response
                 return flask.jsonify({'success': True})
-            # except Exception as e:
-            #     # Log the error
-            #     print(f"Error updating order status: {str(e)}")
-            #     return flask.jsonify({'success': False, 'message': str(e)})
+            
 
         @app.route('/get_order_details/<int:order_id>')
         @security.login_required
@@ -1529,25 +1528,33 @@ class WebApp():
                 'notifications': notifications,
                 'has_more': total_count > (offset + limit)
             })
-        
+
         @app.route('/api/notifications/unread', methods=['GET'])
         @security.login_required
         def unread_notifications():
-            cursor = self.db_configs.conn.cursor()
-            cursor.execute(""" SELECT * FROM notifications WHERE destination = ? AND read = 0 """, (flask.session['username'],))
+            try:
+                username = flask.session['username']
+                if not username:
+                    return flask.jsonify({'error': 'User not authenticated properly', 'notifications': []}), 401
 
-            notifications = cursor.fetchall()
-            columns = [column[0] for column in cursor.description]
-            notifications_dict = [dict(zip(columns, row)) for row in notifications]
+                cursor = self.db_configs.conn.cursor()
+                cursor.execute(""" SELECT * FROM notifications WHERE destination = ? AND read = 0 """, (username,))
 
-            return flask.jsonify({'notifications': notifications_dict})
+                notifications = cursor.fetchall()
+                columns = [column[0] for column in cursor.description]
+                notifications_dict = [dict(zip(columns, row)) for row in notifications]
+
+                return flask.jsonify({'notifications': notifications_dict})
+            except Exception as e:
+                app.logger.error(f"Error fetching unread notifications: {str(e)}")
+                return flask.jsonify({'error': 'Failed to fetch notifications', 'notifications': []}), 500
 
         @app.route('/api/notifications/mark-read', methods=['POST'])
         @security.login_required
         def mark_notification_read():
             if not flask.request.is_json:
                 return flask.jsonify({'error': 'Content-Type must be application/json'}), 415
-            
+
             data = flask.request.get_json()
             notification_id = data.get('id')
             
