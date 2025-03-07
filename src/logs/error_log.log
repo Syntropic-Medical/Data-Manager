@@ -18847,3 +18847,406 @@
 2025-03-06 13:28:03,542 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
 2025-03-06 13:28:03,542 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
 2025-03-06 13:28:03,542 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:06,397 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:06,459 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:06,459 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:06,517 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:06,517 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:06,517 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:06,578 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:06,578 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:06,578 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:06,578 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:06,715 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:06,715 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:06,715 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:06,715 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:06,715 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:06,818 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:06,818 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:06,818 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:06,818 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:06,818 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:06,818 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:06,886 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:06,886 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:06,886 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:06,886 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:06,886 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:06,886 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:06,886 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:06,947 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:06,947 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:06,947 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:06,947 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:06,947 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:06,947 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:06,947 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:06,947 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,004 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,004 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,004 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,004 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,004 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,004 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,004 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,004 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,004 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,068 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,068 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,068 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,068 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,068 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,068 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,068 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,068 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,068 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,068 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,129 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,129 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,129 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,129 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,129 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,129 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,129 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,129 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,129 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,129 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,129 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,186 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,186 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,186 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,186 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,186 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,186 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,186 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,186 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,186 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,186 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,186 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,186 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,248 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,248 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,248 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,248 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,248 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,248 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,248 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,248 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,248 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,248 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,248 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,248 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,248 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,306 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,306 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,306 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,306 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,306 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,306 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,306 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,306 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,306 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,306 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,306 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,306 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,306 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,306 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,364 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,364 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,364 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,364 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,364 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,364 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,364 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,364 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,364 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,364 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,364 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,364 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,364 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,364 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,364 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,421 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,421 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,421 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,421 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,421 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,421 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,421 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,421 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,421 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,421 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,421 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,421 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,421 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,421 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,421 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,421 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,484 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,484 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,484 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,484 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,484 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,484 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,484 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,484 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,484 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,484 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,484 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,484 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,484 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,484 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,484 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,484 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,484 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,594 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,594 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,594 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,594 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,594 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,594 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,594 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,594 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,594 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,594 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,594 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,594 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,594 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,594 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,594 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,594 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,594 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,594 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,643 - error_log - ERROR - <class 'KeyError'> in operators.py at line 186: 'date'
+2025-03-07 15:32:07,643 - error_log - ERROR - <class 'KeyError'> in operators.py at line 186: 'date'
+2025-03-07 15:32:07,643 - error_log - ERROR - <class 'KeyError'> in operators.py at line 186: 'date'
+2025-03-07 15:32:07,643 - error_log - ERROR - <class 'KeyError'> in operators.py at line 186: 'date'
+2025-03-07 15:32:07,643 - error_log - ERROR - <class 'KeyError'> in operators.py at line 186: 'date'
+2025-03-07 15:32:07,643 - error_log - ERROR - <class 'KeyError'> in operators.py at line 186: 'date'
+2025-03-07 15:32:07,643 - error_log - ERROR - <class 'KeyError'> in operators.py at line 186: 'date'
+2025-03-07 15:32:07,643 - error_log - ERROR - <class 'KeyError'> in operators.py at line 186: 'date'
+2025-03-07 15:32:07,643 - error_log - ERROR - <class 'KeyError'> in operators.py at line 186: 'date'
+2025-03-07 15:32:07,643 - error_log - ERROR - <class 'KeyError'> in operators.py at line 186: 'date'
+2025-03-07 15:32:07,643 - error_log - ERROR - <class 'KeyError'> in operators.py at line 186: 'date'
+2025-03-07 15:32:07,643 - error_log - ERROR - <class 'KeyError'> in operators.py at line 186: 'date'
+2025-03-07 15:32:07,643 - error_log - ERROR - <class 'KeyError'> in operators.py at line 186: 'date'
+2025-03-07 15:32:07,643 - error_log - ERROR - <class 'KeyError'> in operators.py at line 186: 'date'
+2025-03-07 15:32:07,643 - error_log - ERROR - <class 'KeyError'> in operators.py at line 186: 'date'
+2025-03-07 15:32:07,643 - error_log - ERROR - <class 'KeyError'> in operators.py at line 186: 'date'
+2025-03-07 15:32:07,643 - error_log - ERROR - <class 'KeyError'> in operators.py at line 186: 'date'
+2025-03-07 15:32:07,643 - error_log - ERROR - <class 'KeyError'> in operators.py at line 186: 'date'
+2025-03-07 15:32:07,643 - error_log - ERROR - <class 'KeyError'> in operators.py at line 186: 'date'
+2025-03-07 15:32:07,696 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,696 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,696 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,696 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,696 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,696 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,696 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,696 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,696 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,696 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,696 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,696 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,696 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,696 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,696 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,696 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,696 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,696 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,696 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:07,696 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,367 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,367 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,367 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,367 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,367 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,367 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,367 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,367 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,367 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,367 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,367 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,367 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,367 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,367 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,367 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,367 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,367 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,367 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,367 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,367 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,367 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,558 - error_log - ERROR - <class 'sqlite3.ProgrammingError'> in operators.py at line 305: Error binding parameter 1: type 'tuple' is not supported
+2025-03-07 15:32:09,558 - error_log - ERROR - <class 'sqlite3.ProgrammingError'> in operators.py at line 305: Error binding parameter 1: type 'tuple' is not supported
+2025-03-07 15:32:09,558 - error_log - ERROR - <class 'sqlite3.ProgrammingError'> in operators.py at line 305: Error binding parameter 1: type 'tuple' is not supported
+2025-03-07 15:32:09,558 - error_log - ERROR - <class 'sqlite3.ProgrammingError'> in operators.py at line 305: Error binding parameter 1: type 'tuple' is not supported
+2025-03-07 15:32:09,558 - error_log - ERROR - <class 'sqlite3.ProgrammingError'> in operators.py at line 305: Error binding parameter 1: type 'tuple' is not supported
+2025-03-07 15:32:09,558 - error_log - ERROR - <class 'sqlite3.ProgrammingError'> in operators.py at line 305: Error binding parameter 1: type 'tuple' is not supported
+2025-03-07 15:32:09,558 - error_log - ERROR - <class 'sqlite3.ProgrammingError'> in operators.py at line 305: Error binding parameter 1: type 'tuple' is not supported
+2025-03-07 15:32:09,558 - error_log - ERROR - <class 'sqlite3.ProgrammingError'> in operators.py at line 305: Error binding parameter 1: type 'tuple' is not supported
+2025-03-07 15:32:09,558 - error_log - ERROR - <class 'sqlite3.ProgrammingError'> in operators.py at line 305: Error binding parameter 1: type 'tuple' is not supported
+2025-03-07 15:32:09,558 - error_log - ERROR - <class 'sqlite3.ProgrammingError'> in operators.py at line 305: Error binding parameter 1: type 'tuple' is not supported
+2025-03-07 15:32:09,558 - error_log - ERROR - <class 'sqlite3.ProgrammingError'> in operators.py at line 305: Error binding parameter 1: type 'tuple' is not supported
+2025-03-07 15:32:09,558 - error_log - ERROR - <class 'sqlite3.ProgrammingError'> in operators.py at line 305: Error binding parameter 1: type 'tuple' is not supported
+2025-03-07 15:32:09,558 - error_log - ERROR - <class 'sqlite3.ProgrammingError'> in operators.py at line 305: Error binding parameter 1: type 'tuple' is not supported
+2025-03-07 15:32:09,558 - error_log - ERROR - <class 'sqlite3.ProgrammingError'> in operators.py at line 305: Error binding parameter 1: type 'tuple' is not supported
+2025-03-07 15:32:09,558 - error_log - ERROR - <class 'sqlite3.ProgrammingError'> in operators.py at line 305: Error binding parameter 1: type 'tuple' is not supported
+2025-03-07 15:32:09,558 - error_log - ERROR - <class 'sqlite3.ProgrammingError'> in operators.py at line 305: Error binding parameter 1: type 'tuple' is not supported
+2025-03-07 15:32:09,558 - error_log - ERROR - <class 'sqlite3.ProgrammingError'> in operators.py at line 305: Error binding parameter 1: type 'tuple' is not supported
+2025-03-07 15:32:09,558 - error_log - ERROR - <class 'sqlite3.ProgrammingError'> in operators.py at line 305: Error binding parameter 1: type 'tuple' is not supported
+2025-03-07 15:32:09,558 - error_log - ERROR - <class 'sqlite3.ProgrammingError'> in operators.py at line 305: Error binding parameter 1: type 'tuple' is not supported
+2025-03-07 15:32:09,558 - error_log - ERROR - <class 'sqlite3.ProgrammingError'> in operators.py at line 305: Error binding parameter 1: type 'tuple' is not supported
+2025-03-07 15:32:09,558 - error_log - ERROR - <class 'sqlite3.ProgrammingError'> in operators.py at line 305: Error binding parameter 1: type 'tuple' is not supported
+2025-03-07 15:32:09,558 - error_log - ERROR - <class 'sqlite3.ProgrammingError'> in operators.py at line 305: Error binding parameter 1: type 'tuple' is not supported
+2025-03-07 15:32:09,795 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,795 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,795 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,795 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,795 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,795 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,795 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,795 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,795 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,795 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,795 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,795 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,795 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,795 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,795 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,795 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,795 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,795 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,795 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,795 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,795 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,795 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,795 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,862 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,862 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,862 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,862 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,862 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,862 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,862 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,862 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,862 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,862 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,862 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,862 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,862 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,862 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,862 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,862 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,862 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,862 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,862 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,862 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,862 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,862 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,862 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,862 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,920 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,920 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,920 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,920 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,920 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,920 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,920 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,920 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,920 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,920 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,920 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,920 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,920 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,920 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,920 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,920 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,920 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,920 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,920 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,920 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,920 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,920 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,920 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,920 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:09,920 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,010 - error_log - ERROR - <class 'ValueError'> in test_utils.py at line 272: Test error message
+2025-03-07 15:32:10,010 - error_log - ERROR - <class 'ValueError'> in test_utils.py at line 272: Test error message
+2025-03-07 15:32:10,010 - error_log - ERROR - <class 'ValueError'> in test_utils.py at line 272: Test error message
+2025-03-07 15:32:10,010 - error_log - ERROR - <class 'ValueError'> in test_utils.py at line 272: Test error message
+2025-03-07 15:32:10,010 - error_log - ERROR - <class 'ValueError'> in test_utils.py at line 272: Test error message
+2025-03-07 15:32:10,010 - error_log - ERROR - <class 'ValueError'> in test_utils.py at line 272: Test error message
+2025-03-07 15:32:10,010 - error_log - ERROR - <class 'ValueError'> in test_utils.py at line 272: Test error message
+2025-03-07 15:32:10,010 - error_log - ERROR - <class 'ValueError'> in test_utils.py at line 272: Test error message
+2025-03-07 15:32:10,010 - error_log - ERROR - <class 'ValueError'> in test_utils.py at line 272: Test error message
+2025-03-07 15:32:10,010 - error_log - ERROR - <class 'ValueError'> in test_utils.py at line 272: Test error message
+2025-03-07 15:32:10,010 - error_log - ERROR - <class 'ValueError'> in test_utils.py at line 272: Test error message
+2025-03-07 15:32:10,010 - error_log - ERROR - <class 'ValueError'> in test_utils.py at line 272: Test error message
+2025-03-07 15:32:10,010 - error_log - ERROR - <class 'ValueError'> in test_utils.py at line 272: Test error message
+2025-03-07 15:32:10,010 - error_log - ERROR - <class 'ValueError'> in test_utils.py at line 272: Test error message
+2025-03-07 15:32:10,010 - error_log - ERROR - <class 'ValueError'> in test_utils.py at line 272: Test error message
+2025-03-07 15:32:10,010 - error_log - ERROR - <class 'ValueError'> in test_utils.py at line 272: Test error message
+2025-03-07 15:32:10,010 - error_log - ERROR - <class 'ValueError'> in test_utils.py at line 272: Test error message
+2025-03-07 15:32:10,010 - error_log - ERROR - <class 'ValueError'> in test_utils.py at line 272: Test error message
+2025-03-07 15:32:10,010 - error_log - ERROR - <class 'ValueError'> in test_utils.py at line 272: Test error message
+2025-03-07 15:32:10,010 - error_log - ERROR - <class 'ValueError'> in test_utils.py at line 272: Test error message
+2025-03-07 15:32:10,010 - error_log - ERROR - <class 'ValueError'> in test_utils.py at line 272: Test error message
+2025-03-07 15:32:10,010 - error_log - ERROR - <class 'ValueError'> in test_utils.py at line 272: Test error message
+2025-03-07 15:32:10,010 - error_log - ERROR - <class 'ValueError'> in test_utils.py at line 272: Test error message
+2025-03-07 15:32:10,010 - error_log - ERROR - <class 'ValueError'> in test_utils.py at line 272: Test error message
+2025-03-07 15:32:10,010 - error_log - ERROR - <class 'ValueError'> in test_utils.py at line 272: Test error message
+2025-03-07 15:32:10,090 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,090 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,090 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,090 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,090 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,090 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,090 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,090 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,090 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,090 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,090 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,090 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,090 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,090 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,090 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,090 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,090 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,090 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,090 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,090 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,090 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,090 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,090 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,090 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,090 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,090 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,188 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,188 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,188 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,188 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,188 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,188 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,188 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,188 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,188 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,188 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,188 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,188 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,188 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,188 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,188 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,188 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,188 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,188 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,188 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,188 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,188 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,188 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,188 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,188 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,188 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,188 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username
+2025-03-07 15:32:10,188 - error_log - ERROR - <class 'sqlite3.IntegrityError'> in operators.py at line 36: UNIQUE constraint failed: users.username

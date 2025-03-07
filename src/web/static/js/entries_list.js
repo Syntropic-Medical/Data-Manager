@@ -3,11 +3,19 @@
  * Contains all JavaScript functionality for the entries list page
  */
 
+// Cache DOM queries for performance
+let resultsContainer, resultsForm, formAction;
+
 /**
- * Submits the form with the specified action
+ * Performance optimized version - Submits the form with the specified action
  * @param {string} action - The action to perform
  */
 function submitForm(action) {
+    // Only query the DOM if our cached elements are not initialized
+    if (!resultsContainer) {
+        resultsContainer = document.getElementById('resultsContainer');
+    }
+    
     // Check if we're in a modal (using actionsForm) or in the results table
     const isModal = document.querySelector('.modal.show') !== null;
     
@@ -17,31 +25,83 @@ function submitForm(action) {
         const form = document.getElementById('actionsForm');
         
         if (actionInput && form) {
-            // Transfer all checked checkboxes from the search results to the actions form
+            // Transfer checkboxes more efficiently
             const checkedBoxes = document.querySelectorAll('.entry-checkbox:checked');
             
-            // First, remove any existing checkboxes from previous submissions
-            const existingInputs = form.querySelectorAll('input[name^="Select&"]');
-            existingInputs.forEach(input => input.remove());
+            // First, create a document fragment to minimize DOM operations
+            const fragment = document.createDocumentFragment();
             
-            // Add the checked checkboxes to the form
+            // Remove any existing checkboxes from previous submissions
+            form.querySelectorAll('input[name^="Select&"]').forEach(input => {
+                input.remove();
+            });
+            
+            // Add the checked checkboxes to the fragment
             checkedBoxes.forEach(checkbox => {
                 const input = document.createElement('input');
                 input.type = 'hidden';
                 input.name = checkbox.id;
                 input.value = 'on';
-                form.appendChild(input);
+                fragment.appendChild(input);
             });
+            
+            // Append the fragment to the form in a single operation
+            form.appendChild(fragment);
             
             // Set the action and submit
             actionInput.value = action;
-            form.submit();
+            
+            // Use FormData for more efficient form submission
+            const formData = new FormData(form);
+            
+            // Submit with fetch API for better performance
+            fetch(form.action, {
+                method: form.method || 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url;
+                } else {
+                    return response.text();
+                }
+            })
+            .then(html => {
+                if (html) {
+                    // Update the page with the response
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = html;
+                    
+                    // Find the results container in the response
+                    const newResults = tempDiv.querySelector('#resultsContainer');
+                    if (newResults && resultsContainer) {
+                        resultsContainer.innerHTML = newResults.innerHTML;
+                        // Reinitialize any event handlers for the new content
+                        initializeTableSorting();
+                    } else {
+                        // Fallback - reload the page
+                        window.location.reload();
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Form submission error:', error);
+                // Fallback to traditional form submission on error
+                form.submit();
+            });
+            
+            return;
         } else {
             console.error('Form or action input element not found');
         }
     } else {
         // We're in the results table, use the form in the results container
-        const resultsForm = document.querySelector('#resultsContainer form');
+        if (!resultsForm) {
+            resultsForm = resultsContainer ? resultsContainer.querySelector('form') : document.querySelector('#resultsContainer form');
+        }
         
         if (!resultsForm) {
             // As a fallback, try using the main actionsForm
@@ -49,23 +109,7 @@ function submitForm(action) {
             const form = document.getElementById('actionsForm');
             
             if (actionInput && form) {
-                // Transfer checkbox selections to the actions form
-                const checkedBoxes = document.querySelectorAll('.entry-checkbox:checked');
-                
-                // Clear previous selections
-                const existingInputs = form.querySelectorAll('input[name^="Select&"]');
-                existingInputs.forEach(input => input.remove());
-                
-                // Add current selections
-                checkedBoxes.forEach(checkbox => {
-                    const input = document.createElement('input');
-                    input.type = 'hidden';
-                    input.name = checkbox.id;
-                    input.value = 'on';
-                    form.appendChild(input);
-                });
-                
-                // Set action and submit
+                // Use optimized approach for the fallback case
                 actionInput.value = action;
                 form.submit();
                 return;
@@ -166,6 +210,42 @@ function initializeTableSorting() {
   } else {
     console.warn('Table sorting function not available. Make sure table_sorting.js is loaded.');
   }
+}
+
+// Use passive event listeners for better scroll performance
+document.addEventListener('DOMContentLoaded', function() {
+    // Add event listener with passive: true for better scroll performance
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    
+    // Initialize other event handlers
+    initializeTableEvents();
+}, { passive: true });
+
+// Efficient scroll handler with throttling
+let isScrollProcessing = false;
+function handleScroll() {
+    // Skip if already processing
+    if (isScrollProcessing) return;
+    isScrollProcessing = true;
+    
+    // Use requestAnimationFrame for better performance
+    requestAnimationFrame(() => {
+        // Check if we're near the bottom of the page
+        const scrollPosition = window.scrollY;
+        const windowHeight = window.innerHeight;
+        const bodyHeight = document.body.scrollHeight;
+        
+        // Load more when 80% scrolled down
+        if (scrollPosition + windowHeight > bodyHeight * 0.8) {
+            // Check if more loading is possible
+            const loadMoreButton = document.querySelector('.load-more-btn');
+            if (loadMoreButton && !loadMoreButton.disabled) {
+                loadMoreButton.click();
+            }
+        }
+        
+        isScrollProcessing = false;
+    });
 }
 
 // Initialize event listeners when DOM is loaded

@@ -1,0 +1,138 @@
+/**
+ * Performance optimizations for Data Manager
+ * This file contains CSS optimizations to improve rendering and reduce browser load
+ */
+
+/* Enable hardware acceleration for animations and transitions */
+.table-container,
+.modal,
+.dropdown-menu,
+.navbar,
+.sidebar {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+  will-change: transform;
+}
+
+/* Optimize table rendering */
+table {
+  contain: layout style;
+}
+
+/* Prevent layout thrashing with fixed table layout */
+.table-sortable {
+  table-layout: fixed;
+  width: 100%;
+}
+
+/* Virtual scroll placeholder styling */
+.virtual-scroll-placeholder {
+  background: transparent !important;
+  border: none !important;
+  pointer-events: none;
+  height: 1px;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Optimize loading indicators */
+.loading-indicator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+}
+
+/* Reduce paint area for hover effects */
+.table-sortable tbody tr:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  transform: translateZ(0);
+}
+
+/* Avoid layout shifts for pagination elements */
+.pagination-container {
+  min-height: 40px;
+  contain: layout;
+}
+
+/* Optimize modal rendering */
+.modal-content {
+  contain: layout style;
+  will-change: transform;
+}
+
+/* Optimize scrolling performance */
+body {
+  overflow-y: overlay;
+}
+
+/* Optimize images to prevent layout shifts */
+img {
+  content-visibility: auto;
+}
+
+/* Prevent content shifting while loading with content placeholders */
+.content-placeholder {
+  background-color: #f5f5f5;
+  animation: placeholder-pulse 1.5s ease-in-out infinite;
+  min-height: 20px;
+  border-radius: 4px;
+}
+
+@keyframes placeholder-pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 0.8; }
+  100% { opacity: 0.6; }
+}
+
+/* Performance optimization for large data tables */
+.data-table {
+  content-visibility: auto;
+  contain-intrinsic-size: 500px; /* Approximate space for table */
+}
+
+/* Reduce repaints during scrolling */
+* {
+  box-sizing: border-box;
+}
+
+/* Debounce animations for dropdowns */
+.dropdown-menu {
+  animation-duration: 0.15s;
+  transition-duration: 0.15s;
+}
+
+/* Optimize checkbox rendering */
+input[type="checkbox"] {
+  contain: strict;
+  will-change: transform;
+}
+
+/* Optimize notification animations */
+.notification-item {
+  transform: translateZ(0);
+  will-change: transform, opacity;
+  transition: transform 0.2s ease-out, opacity 0.2s ease-out;
+}
+
+/* Optimize tooltips */
+.tooltip {
+  contain: content;
+}
+
+/* Improve form field rendering efficiency */
+input, select, textarea {
+  will-change: transform;
+  transition: border-color 0.2s;
+}
+
+/* Apply hardware acceleration to sidebar */
+.sidebar {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  will-change: transform;
+  position: relative;
+  z-index: 100;
+} 

@@ -1,3 +1,13 @@
+// Add debounce function at the top of the file
+function debounce(func, wait) {
+  let timeout;
+  return function(...args) {
+    const context = this;
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(context, args), wait);
+  };
+}
+
 function put_text(id_parent, id, txt) {     
   document.getElementById(id).value = txt;
   document.getElementById(id_parent).style.display = "none";
@@ -19,7 +29,6 @@ function replace_text(id_parent, id, txt) {
         input_txt.splice(i, 1);
       }
     }
-    console.log(input_txt)
     input_txt = input_txt.join(",");
   } else {
     input_txt = txt;
@@ -48,28 +57,34 @@ function replace_text(id_parent, id, txt) {
 
 
  function replace_condition(id, template_name, method_name) {
+  // Only proceed if we have both values
+  if (!template_name || !method_name) return;
 
-    // load /static/loading.gif while the ajax request is being processed
+  // Cache selectors
+  const $element = $(id);
+  
+  // Empty only once
+  $element.empty();
 
-    $(id).empty();
+  // Simplified loading indicator
+  $element.html("<img src='/static/assets/loading.gif' alt='loading' style='margin-left: auto; margin-right: auto; display: block;'>");
 
-    var condition_html = "<img src='/static/assets/loading.gif' alt='loading' style='margin-left: auto; margin-right: auto; display: block;'>";
-    $(id).html(condition_html);
-
-    // make an ajax request to the server to get the condition html
-      $.ajax({
-          method:"post",
-          url:"/get_conditoin_by_templatename_methodname",
-          data:{template_name:template_name, method_name:method_name},
-          success:function(res){
-              $(id).empty();
-              condition_html = res;
-              $(id).html(condition_html);
-          },
-          error:function(err){
-              console.log(err);
-          }
-      });
+  // Use a fetch API instead of jQuery Ajax for better performance
+  fetch("/get_conditoin_by_templatename_methodname", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: `template_name=${encodeURIComponent(template_name)}&method_name=${encodeURIComponent(method_name)}`
+  })
+  .then(response => response.text())
+  .then(html => {
+    $element.html(html);
+  })
+  .catch(error => {
+    console.error("Error fetching condition:", error);
+    $element.html("<p>Error loading condition. Please try again.</p>");
+  });
  };
 
 
@@ -80,22 +95,39 @@ $(document).ready(function(){
   
   // For author_search
   if ($("#author_search").length && $("#author_search_datalist").length) {
-    $("#author_search").on("input", function(e){
-      $("#author_search_datalist").css("display", "block");
-      $("#author_search_datalist").empty();
-      $.ajax({
-          method:"post",
-          url:"/author_search",
-          data:{text:$("#author_search").val()},
-          success:function(res){
-              var data = "";
-              $.each(res,function(index,value){
-                  data += "<a class='search dropdown-item' onclick='replace_text(`author_search_datalist`, `author_search`, `"+value['author']+"`)'>";
-                  data += value['author']+"</a>";
-              });
-              $("#author_search_datalist").html(data);
-          }
+    const debouncedAuthorSearch = debounce(function(value) {
+      const $datalist = $("#author_search_datalist");
+      $datalist.css("display", "block");
+      
+      // Don't make unnecessary requests for empty inputs
+      if (!value.trim()) {
+        $datalist.empty();
+        return;
+      }
+      
+      fetch("/author_search", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: `text=${encodeURIComponent(value)}`
+      })
+      .then(response => response.json())
+      .then(res => {
+        let data = "";
+        res.forEach(value => {
+          data += `<a class='search dropdown-item' onclick='replace_text("author_search_datalist", "author_search", "${value.author}")'>`;
+          data += value.author + "</a>";
+        });
+        $datalist.html(data);
+      })
+      .catch(error => {
+        console.error("Error in author search:", error);
       });
+    }, 300); // 300ms debounce
+    
+    $("#author_search").on("input", function() {
+      debouncedAuthorSearch($(this).val());
     });
     
     $(document).click(function(e) {
