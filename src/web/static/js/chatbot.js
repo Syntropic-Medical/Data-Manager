@@ -293,7 +293,7 @@ How can I assist you today?`;
   // Add suggested queries
   function addSuggestedQueries() {
     const suggestedQueries = [
-      "Find my recent entries",
+      "Find all SOPs from last month",
       "How do I create a new entry?",
       "Show all entries from last month"
     ];
