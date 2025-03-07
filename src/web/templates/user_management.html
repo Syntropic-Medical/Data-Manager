@@ -32,7 +32,7 @@
                             <td>{{user.username}}</td>
                             <td>{{user.name if user.name else '-'}}</td>
                             <td>{{user.email if user.email else '-'}}</td>
-                            <td>{{user.email_enabled|default(1)}}</td>
+                            <td>{% if user.email_enabled == 1 %}Enabled{% else %}Disabled{% endif %}</td>
                             <td>
                                 {% if user.admin %}
                                     <span class="badge bg-primary">Admin</span>

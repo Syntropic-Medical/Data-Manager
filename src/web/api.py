@@ -1130,7 +1130,6 @@ class WebApp():
                 )
 
                 return flask.jsonify({'success': True})
-            
 
         @app.route('/get_order_details/<int:order_id>')
         @security.login_required
